@@ -26,6 +26,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.index.IndexReader;
@@ -51,6 +52,11 @@ import org.apache.solr.spelling.suggest.jaspell.JaspellLookupFactory;
 import org.apache.solr.spelling.suggest.tst.TSTLookupFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+// new imports
+import org.apache.solr.schema.SchemaField;
+import org.apache.solr.schema.IndexSchema;
+
 
 public class SuggesterMK2 extends SolrSpellChecker {
   private static final Logger LOG = LoggerFactory.getLogger(SuggesterMK2.class);
@@ -82,6 +88,8 @@ public class SuggesterMK2 extends SolrSpellChecker {
   protected SolrCore core;
 
   private LookupFactory factory;
+  
+  private Map<String,SchemaField> fields;
   
   @Override
   public String init(NamedList config, SolrCore core) {
@@ -127,6 +135,15 @@ public class SuggesterMK2 extends SolrSpellChecker {
   @Override
   public void build(SolrCore core, SolrIndexSearcher searcher) throws IOException {
     LOG.info("build()");
+
+    // load fields map
+    fields = core.getLatestSchema().getFields();
+    LOG.info("Loaded fields: ");
+    for(String field : fields.keySet()) {
+      LOG.info(field);
+    }
+
+
     if (sourceLocation == null) {
       reader = searcher.getIndexReader();
       dictionary = new HighFrequencyDictionary(reader, field, threshold);
@@ -184,6 +201,7 @@ public class SuggesterMK2 extends SolrSpellChecker {
       LOG.info("Lookup is null - invoke spellchecker.build first");
       return EMPTY_RESULT;
     }
+
     SpellingResult res = new SpellingResult();
     CharsRef scratch = new CharsRef();
     for (Token t : options.tokens) {
