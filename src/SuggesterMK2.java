@@ -190,10 +190,11 @@ public class SuggesterMK2 extends SolrSpellChecker {
       scratch.chars = t.buffer();
       scratch.offset = 0;
       scratch.length = t.length();
+      // LOG.debug("CharsRef: " + scratch.toString());
       boolean onlyMorePopular = (options.suggestMode == SuggestMode.SUGGEST_MORE_POPULAR) &&
         !(lookup instanceof WFSTCompletionLookup) &&
         !(lookup instanceof AnalyzingSuggester);
-      List<LookupResult> suggestions = lookup.lookup(scratch, onlyMorePopular, options.count);
+      List<LookupResult> suggestions = lookup.lookup(scratch, onlyMorePopular, options.count); // scratch = query (key).
       if (suggestions == null) {
         continue;
       }
