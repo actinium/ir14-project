@@ -26,7 +26,9 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
+
 
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.index.IndexReader;
@@ -88,7 +90,7 @@ public class SuggesterMK2 extends SolrSpellChecker {
   protected SolrCore core;
 
   private LookupFactory factory;
-  
+
   private Map<String,SchemaField> fields;
   
   @Override
@@ -212,7 +214,15 @@ public class SuggesterMK2 extends SolrSpellChecker {
       boolean onlyMorePopular = (options.suggestMode == SuggestMode.SUGGEST_MORE_POPULAR) &&
         !(lookup instanceof WFSTCompletionLookup) &&
         !(lookup instanceof AnalyzingSuggester);
-      List<LookupResult> suggestions = lookup.lookup(scratch, onlyMorePopular, options.count); // scratch = query (key).
+      // List<LookupResult> suggestions = lookup.lookup(scratch, onlyMorePopular, options.count); // scratch = query (key).
+        List<LookupResult> suggestions = new ArrayList<LookupResult>();
+        for (String field : fields.keySet()) {
+          if(field.startsWith(scratch.toString())) {
+            suggestions.add(new LookupResult(field, options.count));
+          }
+
+        }
+
       if (suggestions == null) {
         continue;
       }
