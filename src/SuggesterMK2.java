@@ -25,6 +25,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -52,6 +53,7 @@ import org.apache.solr.spelling.suggest.LookupFactory;
 import org.apache.solr.spelling.suggest.fst.FSTLookupFactory;
 import org.apache.solr.spelling.suggest.jaspell.JaspellLookupFactory;
 import org.apache.solr.spelling.suggest.tst.TSTLookupFactory;
+import org.apache.solr.spelling.suggest.Suggester;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,20 +94,51 @@ public class SuggesterMK2 extends SolrSpellChecker {
   private LookupFactory factory;
 
   private Map<String,SchemaField> fields;
-  private List<SchemaField> target_fields;
+  
+  private Map<String, Suggester> delegates;
+  
+  public SuggesterMK2() {
+	delegates = new HashMap<String, Suggester>();
+  }
   
   @Override
   public String init(NamedList config, SolrCore core) {
     LOG.info("init: " + config);
     String name = super.init(config, core);
+	
+	// /* Remove these?
     threshold = config.get(THRESHOLD_TOKEN_FREQUENCY) == null ? 0.0f
             : (Float)config.get(THRESHOLD_TOKEN_FREQUENCY);
     sourceLocation = (String) config.get(LOCATION);
     lookupImpl = (String)config.get(LOOKUP_IMPL);
+	// */
 	
-	target_fields = (List<SchemaField>)config.get("field");
-	assert(target_fields != null);
+	// load fields map
+    fields = core.getLatestSchema().getFields();
+    LOG.info("Loaded fields: ");
+    for(String field : fields.keySet()) {
+      LOG.info(field);
+    }
 	
+	// Create configuration with the parts common to all delegates:
+	NamedList delegateBaseConfig = config.clone();
+	delegateBaseConfig.removeAll("classname");
+	delegateBaseConfig.add("classname", "org.apache.solr.spelling.suggest.Suggester");
+	
+	for (Object fieldName_obj : delegateBaseConfig.removeAll("field")) {
+		String fieldName = (String)fieldName_obj;
+		LOG.info("Creating delegate for field: " + fieldName);
+		
+		// Create configuration for this delegate suggester
+		NamedList delegateConfig = delegateBaseConfig.clone();
+		delegateConfig.add("field", fieldName);
+		
+		Suggester newDelegate = new Suggester();
+		newDelegate.init(delegateConfig, core);
+		delegates.put(fieldName, newDelegate);
+	}
+	
+	/* // Obsolete
     // support the old classnames without -Factory for config file backwards compatibility.
     if (lookupImpl == null || "org.apache.solr.spelling.suggest.jaspell.JaspellLookup".equals(lookupImpl)) {
       lookupImpl = JaspellLookupFactory.class.getName();
@@ -135,21 +168,19 @@ public class SuggesterMK2 extends SolrSpellChecker {
         }
       }
     }
+	*/
     return name;
   }
   
   @Override
   public void build(SolrCore core, SolrIndexSearcher searcher) throws IOException {
     LOG.info("build()");
-
-    // load fields map
-    fields = core.getLatestSchema().getFields();
-    LOG.info("Loaded fields: ");
-    for(String field : fields.keySet()) {
-      LOG.info(field);
-    }
-
-
+	
+	for (Map.Entry<String, Suggester> entry : delegates.entrySet()) {
+		entry.getValue().build(core, searcher);
+	}
+	
+	/* // Obsolete
     if (sourceLocation == null) {
       reader = searcher.getIndexReader();
       dictionary = new HighFrequencyDictionary(reader, field, threshold);
@@ -177,11 +208,18 @@ public class SuggesterMK2 extends SolrSpellChecker {
         LOG.info("Stored suggest data to: " + target.getAbsolutePath());
       }
     }
+	*/
   }
 
   @Override
   public void reload(SolrCore core, SolrIndexSearcher searcher) throws IOException {
     LOG.info("reload()");
+	
+	for (Map.Entry<String, Suggester> entry : delegates.entrySet()) {
+		entry.getValue().reload(core, searcher);
+	}
+	
+	/* // Obsolete
     if (dictionary == null && storeDir != null) {
       // this may be a firstSearcher event, try loading it
       FileInputStream is = new FileInputStream(new File(storeDir, factory.storeFileName()));
@@ -196,6 +234,7 @@ public class SuggesterMK2 extends SolrSpellChecker {
     }
     // loading was unsuccessful - build it again
     build(core, searcher);
+	*/
   }
 
   static SpellingResult EMPTY_RESULT = new SpellingResult();
@@ -203,10 +242,13 @@ public class SuggesterMK2 extends SolrSpellChecker {
   @Override
   public SpellingResult getSuggestions(SpellingOptions options) throws IOException {
     LOG.debug("getSuggestions (MK2): " + options.tokens);
+	
+	/* // Obsolete
     if (lookup == null) {
       LOG.info("Lookup is null - invoke spellchecker.build first");
       return EMPTY_RESULT;
     }
+	*/
 
     SpellingResult res = new SpellingResult();
     CharsRef scratch = new CharsRef();
@@ -214,18 +256,49 @@ public class SuggesterMK2 extends SolrSpellChecker {
       scratch.chars = t.buffer();
       scratch.offset = 0;
       scratch.length = t.length();
-      // LOG.debug("CharsRef: " + scratch.toString());
+	  
+	  // LOG.debug("CharsRef: " + scratch.toString());
       boolean onlyMorePopular = (options.suggestMode == SuggestMode.SUGGEST_MORE_POPULAR) &&
-        !(lookup instanceof WFSTCompletionLookup) &&
-        !(lookup instanceof AnalyzingSuggester);
+      !(lookup instanceof WFSTCompletionLookup) &&
+      !(lookup instanceof AnalyzingSuggester);
       // List<LookupResult> suggestions = lookup.lookup(scratch, onlyMorePopular, options.count); // scratch = query (key).
-        List<LookupResult> suggestions = new ArrayList<LookupResult>();
+      List<LookupResult> suggestions = new ArrayList<LookupResult>();
+	  
+	  // Solr splits on the following characters automatically
+	  // : ; , . + ( ) { } '
+	  // so they can't be used as field delimiters
+	  // - _ works
+	  String[] field_value = scratch.toString().split("_");
+	  // or field_value.length > 1 ?
+	  if (field_value.length == 2) {
+		// Autocomplete field value:
+		
+	    String target_field = field_value[0];
+	    String target_value = field_value[1];
+		LOG.info("Delegate to field: " + target_field);
+		// XXX TODO: Error handling!
+		// At least check if field is in delegates!
+		
+		// Construct new options for delegate:
+		ArrayList<Token> tokens = new ArrayList<Token>();
+		tokens.add(new Token(target_value, 0, target_value.length()));
+		SpellingOptions delegateOptions = new SpellingOptions(tokens, tokens.size());
+		LOG.info("new tokens: " + delegateOptions.tokens);
+		
+		// Get results from delegate
+	    SpellingResult delegateResult = delegates.get(target_field).getSuggestions(delegateOptions);
+		// TODO: preprocess, and don't just return the results as is
+		// At the very least we want results on the form name:value
+		// and we get only value completions from the delegate
+		return delegateResult;
+	  } else {
+		// Autocomplete field name:
         for (String field : fields.keySet()) {
           if(field.startsWith(scratch.toString())) {
             suggestions.add(new LookupResult(field, options.count));
           }
-
         }
+	  }
 
       if (suggestions == null) {
         continue;
