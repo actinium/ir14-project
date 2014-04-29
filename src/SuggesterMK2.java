@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -127,8 +128,16 @@ public class SuggesterMK2 extends SolrSpellChecker {
 	delegateBaseConfig.removeAll("classname");
 	delegateBaseConfig.add("classname", "org.apache.solr.spelling.suggest.Suggester");
 	
-	for (Object fieldName_obj : delegateBaseConfig.removeAll("field")) {
-		String fieldName = (String)fieldName_obj;
+	Collection<String> allFields = delegateBaseConfig.removeAll("field");
+	if (allFields == null) {
+		// No fields marked in solrconfig.xml
+		// Default to all fields in schema
+		allFields = new ArrayList<String>();
+		for (String field : fields.keySet()) {
+		  allFields.add(field);
+		}
+	}
+	for (String fieldName : allFields) {
 		LOG.info("Creating delegate for field: " + fieldName);
 		
 		// Create configuration for this delegate suggester
@@ -294,7 +303,7 @@ public class SuggesterMK2 extends SolrSpellChecker {
 	    SpellingResult delegateResults = delegates.get(target_field).getSuggestions(delegateOptions);
 		for (Map.Entry<Token, LinkedHashMap<String, Integer>> entry : delegateResults.getSuggestions().entrySet()) {
 			for (Map.Entry<String, Integer> key_weight : entry.getValue().entrySet()) {
-				String key = target_field + DELIMITER + key_weight.getKey();
+				String key = target_field + ":" + key_weight.getKey();
 				int weight = key_weight.getValue();
 				suggestions.add(new LookupResult(key, weight));
 			}
