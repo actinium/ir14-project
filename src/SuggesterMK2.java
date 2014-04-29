@@ -101,7 +101,7 @@ public class SuggesterMK2 extends SolrSpellChecker {
   private Map<String, Suggester> delegates;
   
   public SuggesterMK2() {
-	delegates = new HashMap<String, Suggester>();
+	  delegates = new HashMap<String, Suggester>();
   }
   
   @Override
@@ -148,104 +148,24 @@ public class SuggesterMK2 extends SolrSpellChecker {
 		newDelegate.init(delegateConfig, core);
 		delegates.put(fieldName, newDelegate);
 	}
-	
-	/* // Obsolete
-    // support the old classnames without -Factory for config file backwards compatibility.
-    if (lookupImpl == null || "org.apache.solr.spelling.suggest.jaspell.JaspellLookup".equals(lookupImpl)) {
-      lookupImpl = JaspellLookupFactory.class.getName();
-    } else if ("org.apache.solr.spelling.suggest.tst.TSTLookup".equals(lookupImpl)) {
-      lookupImpl = TSTLookupFactory.class.getName();
-    } else if ("org.apache.solr.spelling.suggest.fst.FSTLookup".equals(lookupImpl)) {
-      lookupImpl = FSTLookupFactory.class.getName();
-    }
-
-    factory = core.getResourceLoader().newInstance(lookupImpl, LookupFactory.class);
     
-    lookup = factory.create(config, core);
-    String store = (String)config.get(STORE_DIR);
-    if (store != null) {
-      storeDir = new File(store);
-      if (!storeDir.isAbsolute()) {
-        storeDir = new File(core.getDataDir() + File.separator + storeDir);
-      }
-      if (!storeDir.exists()) {
-        storeDir.mkdirs();
-      } else {
-        // attempt reload of the stored lookup
-        try {
-          lookup.load(new FileInputStream(new File(storeDir, factory.storeFileName())));
-        } catch (IOException e) {
-          LOG.warn("Loading stored lookup data failed", e);
-        }
-      }
-    }
-	*/
     return name;
   }
   
   @Override
   public void build(SolrCore core, SolrIndexSearcher searcher) throws IOException {
     LOG.info("build()");
-	
-	for (Map.Entry<String, Suggester> entry : delegates.entrySet()) {
-		entry.getValue().build(core, searcher);
-	}
-	
-	/* // Obsolete
-    if (sourceLocation == null) {
-      reader = searcher.getIndexReader();
-      dictionary = new HighFrequencyDictionary(reader, field, threshold);
-    } else {
-      try {
-        dictionary = new FileDictionary(new InputStreamReader(
-                core.getResourceLoader().openResource(sourceLocation), StandardCharsets.UTF_8));
-      } catch (UnsupportedEncodingException e) {
-        // should not happen
-        LOG.error("should not happen", e);
-      }
-    }
-
-    lookup.build(dictionary);
-    if (storeDir != null) {
-      File target = new File(storeDir, factory.storeFileName());
-      if(!lookup.store(new FileOutputStream(target))) {
-        if (sourceLocation == null) {
-          assert reader != null && field != null;
-          LOG.error("Store Lookup build from index on field: " + field + " failed reader has: " + reader.maxDoc() + " docs");
-        } else {
-          LOG.error("Store Lookup build from sourceloaction: " + sourceLocation + " failed");
-        }
-      } else {
-        LOG.info("Stored suggest data to: " + target.getAbsolutePath());
-      }
-    }
-	*/
-  }
+	  for (Map.Entry<String, Suggester> entry : delegates.entrySet()) {
+	    entry.getValue().build(core, searcher);
+	  }
+  } 
 
   @Override
   public void reload(SolrCore core, SolrIndexSearcher searcher) throws IOException {
     LOG.info("reload()");
-	
-	for (Map.Entry<String, Suggester> entry : delegates.entrySet()) {
-		entry.getValue().reload(core, searcher);
-	}
-	
-	/* // Obsolete
-    if (dictionary == null && storeDir != null) {
-      // this may be a firstSearcher event, try loading it
-      FileInputStream is = new FileInputStream(new File(storeDir, factory.storeFileName()));
-      try {
-        if (lookup.load(is)) {
-          return;  // loaded ok
-        }
-      } finally {
-        IOUtils.closeWhileHandlingException(is);
-      }
-      LOG.debug("load failed, need to build Lookup again");
-    }
-    // loading was unsuccessful - build it again
-    build(core, searcher);
-	*/
+	  for (Map.Entry<String, Suggester> entry : delegates.entrySet()) {
+		  entry.getValue().reload(core, searcher);
+	  }
   }
 
   static SpellingResult EMPTY_RESULT = new SpellingResult();
@@ -254,13 +174,6 @@ public class SuggesterMK2 extends SolrSpellChecker {
   @Override
   public SpellingResult getSuggestions(SpellingOptions options) throws IOException {
     LOG.debug("getSuggestions (MK2): " + options.tokens);
-	
-	/* // Obsolete
-    if (lookup == null) {
-      LOG.info("Lookup is null - invoke spellchecker.build first");
-      return EMPTY_RESULT;
-    }
-	*/
 
     SpellingResult res = new SpellingResult();
     CharsRef scratch = new CharsRef();
@@ -276,46 +189,46 @@ public class SuggesterMK2 extends SolrSpellChecker {
       // List<LookupResult> suggestions = lookup.lookup(scratch, onlyMorePopular, options.count); // scratch = query (key).
       List<LookupResult> suggestions = new ArrayList<LookupResult>();
 	  
-	  // Solr splits on the following characters automatically
-	  // : ; , . + ( ) { } '
-	  // so they can't be used as field delimiters
-	  // - _ works
-	  String[] field_value = scratch.toString().split(DELIMITER);
-	  // or field_value.length > 1 ?
-	  if (field_value.length == 2) {
-		// Autocomplete field value:
+  	  // Solr splits on the following characters automatically
+  	  // : ; , . + ( ) { } '
+  	  // so they can't be used as field delimiters
+  	  // - _ works
+  	  String[] field_value = scratch.toString().split(DELIMITER);
+  	  // or field_value.length > 1 ?
+  	  if (field_value.length == 2) {
+  		// Autocomplete field value:
 		
-	    String target_field = field_value[0];
-	    String target_value = field_value[1];
-		LOG.info("Delegate to field: " + target_field);
-		if (!delegates.containsKey(target_field)) {
-			LOG.info("No such field: " + target_field);
-			break;
-		}
-		
-		// Construct new options for delegate:
-		ArrayList<Token> tokens = new ArrayList<Token>();
-		tokens.add(new Token(target_value, 0, target_value.length()));
-		SpellingOptions delegateOptions = new SpellingOptions(tokens, options.count);
-		LOG.info("new tokens: " + delegateOptions.tokens);
-		
-		// Get results from delegate
-	    SpellingResult delegateResults = delegates.get(target_field).getSuggestions(delegateOptions);
-		for (Map.Entry<Token, LinkedHashMap<String, Integer>> entry : delegateResults.getSuggestions().entrySet()) {
-			for (Map.Entry<String, Integer> key_weight : entry.getValue().entrySet()) {
-				String key = target_field + ":" + key_weight.getKey();
-				int weight = key_weight.getValue();
-				suggestions.add(new LookupResult(key, weight));
-			}
-		}
-	  } else {
-		// Autocomplete field name:
-        for (String field : fields.keySet()) {
-          if(field.startsWith(scratch.toString())) {
-            suggestions.add(new LookupResult(field, options.count));
+  	    String target_field = field_value[0];
+  	    String target_value = field_value[1];
+  		  LOG.info("Delegate to field: " + target_field);
+  		  if (!delegates.containsKey(target_field)) {
+  			  LOG.info("No such field: " + target_field);
+  			  break;
+  		  }
+  		
+    		// Construct new options for delegate:
+    		ArrayList<Token> tokens = new ArrayList<Token>();
+    		tokens.add(new Token(target_value, 0, target_value.length()));
+    		SpellingOptions delegateOptions = new SpellingOptions(tokens, options.count);
+    		LOG.info("new tokens: " + delegateOptions.tokens);
+    		
+    		// Get results from delegate
+    	    SpellingResult delegateResults = delegates.get(target_field).getSuggestions(delegateOptions);
+    		for (Map.Entry<Token, LinkedHashMap<String, Integer>> entry : delegateResults.getSuggestions().entrySet()) {
+    			for (Map.Entry<String, Integer> key_weight : entry.getValue().entrySet()) {
+    				String key = target_field + ":" + key_weight.getKey();
+    				int weight = key_weight.getValue();
+    				suggestions.add(new LookupResult(key, weight));
+    			}
+    		}
+  	  } else {
+  		// Autocomplete field name:
+          for (String field : fields.keySet()) {
+            if(field.startsWith(scratch.toString())) {
+              suggestions.add(new LookupResult(field, options.count));
+            }
           }
-        }
-	  }
+  	  }
 
       if (suggestions == null) {
         continue;
