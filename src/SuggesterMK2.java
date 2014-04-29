@@ -92,6 +92,7 @@ public class SuggesterMK2 extends SolrSpellChecker {
   private LookupFactory factory;
 
   private Map<String,SchemaField> fields;
+  private List<SchemaField> target_fields;
   
   @Override
   public String init(NamedList config, SolrCore core) {
@@ -101,7 +102,10 @@ public class SuggesterMK2 extends SolrSpellChecker {
             : (Float)config.get(THRESHOLD_TOKEN_FREQUENCY);
     sourceLocation = (String) config.get(LOCATION);
     lookupImpl = (String)config.get(LOOKUP_IMPL);
-
+	
+	target_fields = (List<SchemaField>)config.get("field");
+	assert(target_fields != null);
+	
     // support the old classnames without -Factory for config file backwards compatibility.
     if (lookupImpl == null || "org.apache.solr.spelling.suggest.jaspell.JaspellLookup".equals(lookupImpl)) {
       lookupImpl = JaspellLookupFactory.class.getName();
