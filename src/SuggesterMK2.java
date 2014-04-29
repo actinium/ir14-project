@@ -26,6 +26,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -41,6 +42,7 @@ import org.apache.lucene.search.suggest.Lookup.LookupResult;
 import org.apache.lucene.search.suggest.Lookup;
 import org.apache.lucene.search.suggest.analyzing.AnalyzingSuggester;
 import org.apache.lucene.search.suggest.fst.WFSTCompletionLookup;
+import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.CharsRef;
 import org.apache.lucene.util.IOUtils;
 import org.apache.solr.common.util.NamedList;
@@ -238,6 +240,7 @@ public class SuggesterMK2 extends SolrSpellChecker {
   }
 
   static SpellingResult EMPTY_RESULT = new SpellingResult();
+  static String DELIMITER = "_";
 
   @Override
   public SpellingResult getSuggestions(SpellingOptions options) throws IOException {
@@ -268,7 +271,7 @@ public class SuggesterMK2 extends SolrSpellChecker {
 	  // : ; , . + ( ) { } '
 	  // so they can't be used as field delimiters
 	  // - _ works
-	  String[] field_value = scratch.toString().split("_");
+	  String[] field_value = scratch.toString().split(DELIMITER);
 	  // or field_value.length > 1 ?
 	  if (field_value.length == 2) {
 		// Autocomplete field value:
@@ -276,21 +279,26 @@ public class SuggesterMK2 extends SolrSpellChecker {
 	    String target_field = field_value[0];
 	    String target_value = field_value[1];
 		LOG.info("Delegate to field: " + target_field);
-		// XXX TODO: Error handling!
-		// At least check if field is in delegates!
+		if (!delegates.containsKey(target_field)) {
+			LOG.info("No such field: " + target_field);
+			break;
+		}
 		
 		// Construct new options for delegate:
 		ArrayList<Token> tokens = new ArrayList<Token>();
 		tokens.add(new Token(target_value, 0, target_value.length()));
-		SpellingOptions delegateOptions = new SpellingOptions(tokens, tokens.size());
+		SpellingOptions delegateOptions = new SpellingOptions(tokens, options.count);
 		LOG.info("new tokens: " + delegateOptions.tokens);
 		
 		// Get results from delegate
-	    SpellingResult delegateResult = delegates.get(target_field).getSuggestions(delegateOptions);
-		// TODO: preprocess, and don't just return the results as is
-		// At the very least we want results on the form name:value
-		// and we get only value completions from the delegate
-		return delegateResult;
+	    SpellingResult delegateResults = delegates.get(target_field).getSuggestions(delegateOptions);
+		for (Map.Entry<Token, LinkedHashMap<String, Integer>> entry : delegateResults.getSuggestions().entrySet()) {
+			for (Map.Entry<String, Integer> key_weight : entry.getValue().entrySet()) {
+				String key = target_field + DELIMITER + key_weight.getKey();
+				int weight = key_weight.getValue();
+				suggestions.add(new LookupResult(key, weight));
+			}
+		}
 	  } else {
 		// Autocomplete field name:
         for (String field : fields.keySet()) {
