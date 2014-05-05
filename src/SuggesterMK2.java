@@ -216,7 +216,7 @@ public class SuggesterMK2 extends SolrSpellChecker {
     	    SpellingResult delegateResults = delegates.get(target_field).getSuggestions(delegateOptions);
     		for (Map.Entry<Token, LinkedHashMap<String, Integer>> entry : delegateResults.getSuggestions().entrySet()) {
     			for (Map.Entry<String, Integer> key_weight : entry.getValue().entrySet()) {
-    				String key = target_field + ":" + key_weight.getKey();
+    				String key = target_field + ":\"" + key_weight.getKey() + "\"";
     				int weight = key_weight.getValue();
     				suggestions.add(new LookupResult(key, weight));
     			}
@@ -225,9 +225,22 @@ public class SuggesterMK2 extends SolrSpellChecker {
   		// Autocomplete field name:
           for (String field : fields.keySet()) {
             if(field.startsWith(scratch.toString())) {
-              suggestions.add(new LookupResult(field, options.count));
+              suggestions.add(new LookupResult(field + ":\"", options.count));
             }
           }
+		// Autocomplete field contents
+		// Copypasted code: TODO: merge with above
+		for (Map.Entry<String, Suggester> delegateEntry : delegates.entrySet()) {
+			// Get results from delegate
+    	    SpellingResult delegateResults = delegateEntry.getValue().getSuggestions(options);
+    		for (Map.Entry<Token, LinkedHashMap<String, Integer>> entry : delegateResults.getSuggestions().entrySet()) {
+    			for (Map.Entry<String, Integer> key_weight : entry.getValue().entrySet()) {
+    				String key = delegateEntry.getKey() + ":\"" + key_weight.getKey() + "\"";
+    				int weight = key_weight.getValue();
+    				suggestions.add(new LookupResult(key, weight));
+    			}
+    		}
+		}
   	  }
 
       if (suggestions == null) {
