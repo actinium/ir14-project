@@ -223,9 +223,9 @@ public class SuggesterMK2 extends SolrSpellChecker {
     		}
   	  } else {
   		// Autocomplete field name:
-          for (String field : fields.keySet()) {
-            if(field.startsWith(scratch.toString())) {
-              suggestions.add(new LookupResult(field + ":\"", options.count));
+          for (Map.Entry<String, Suggester> delegateEntry : delegates.entrySet()) {
+            if(delegateEntry.getKey().startsWith(scratch.toString())) {
+              suggestions.add(new LookupResult(delegateEntry.getKey() + ":\"", options.count));
             }
           }
 		// Autocomplete field contents
