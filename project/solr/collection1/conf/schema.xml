@@ -241,7 +241,9 @@
         alternately, change the type="ignored" to some other type e.g. "text" if you want 
         unknown fields indexed and/or stored by default --> 
    <!--dynamicField name="*" type="ignored" multiValued="true" /-->
+    
 
+    <!-- ir14 -->
     <field name="ir14_auto_complete" type="ir14_auto_complete" indexed="true" stored="false" multiValued="true" />
     <dynamicField name="*_ir14_auto_complete" type="ir14_auto_complete" indexed="true" stored="false" multiValued="true" />
     
@@ -292,7 +294,7 @@
    <copyField source="url" dest="text"/>
 
 
-   <!-- IR14 -->
+   <!-- ir14 -->
    <copyField source="name" dest="name_ir14_auto_complete"/>
    <copyField source="features" dest="features_ir14_auto_complete"/>
 
@@ -314,6 +316,7 @@
  
   <types>
 
+    <!-- ir14 -->
     <fieldType name="ir14_auto_complete" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
           <tokenizer class="solr.KeywordTokenizerFactory" />
