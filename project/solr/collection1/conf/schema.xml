@@ -241,9 +241,11 @@
         alternately, change the type="ignored" to some other type e.g. "text" if you want 
         unknown fields indexed and/or stored by default --> 
    <!--dynamicField name="*" type="ignored" multiValued="true" /-->
-   
- </fields>
 
+    <field name="ir14_auto_complete" type="ir14_auto_complete" indexed="true" stored="false" multiValued="true" />
+    <dynamicField name="*_ir14_auto_complete" type="ir14_auto_complete" indexed="true" stored="false" multiValued="true" />
+    
+ </fields>
 
  <!-- Field to use to determine and enforce document uniqueness. 
       Unless this field is marked with required="false", it will be a required field
@@ -289,6 +291,14 @@
    <copyField source="resourcename" dest="text"/>
    <copyField source="url" dest="text"/>
 
+
+   <!-- IR14 -->
+   <copyField source="name" dest="name_ir14_auto_complete"/>
+   <copyField source="features" dest="features_ir14_auto_complete"/>
+
+   
+
+
    <!-- Create a string version of author for faceting -->
    <copyField source="author" dest="author_s"/>
 	
@@ -303,6 +313,14 @@
    <!-- <copyField source="name" dest="alphaNameSort"/> -->
  
   <types>
+
+    <fieldType name="ir14_auto_complete" class="solr.TextField" positionIncrementGap="100">
+      <analyzer>
+          <tokenizer class="solr.KeywordTokenizerFactory" />
+          <filter class="solr.LowerCaseFilterFactory" />
+      </analyzer>
+    </fieldType>
+
     <!-- field type definitions. The "name" attribute is
        just a label to be used by field definitions.  The "class"
        attribute and any other attributes determine the real

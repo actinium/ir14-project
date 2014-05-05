@@ -27,10 +27,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Set;
 
 
 import org.apache.lucene.analysis.Token;
@@ -99,9 +101,12 @@ public class SuggesterMK2 extends SolrSpellChecker {
   private Map<String,SchemaField> fields;
   
   private Map<String, Suggester> delegates;
+
+  private Set<String> suggestionFields;
   
   public SuggesterMK2() {
 	  delegates = new HashMap<String, Suggester>();
+    suggestionFields = new HashSet<String>();
   }
   
   @Override
@@ -142,11 +147,14 @@ public class SuggesterMK2 extends SolrSpellChecker {
 		
 		// Create configuration for this delegate suggester
 		NamedList delegateConfig = delegateBaseConfig.clone();
-		delegateConfig.add("field", fieldName);
+		delegateConfig.add("field", fieldName + "_ir14_auto_complete");
+
 		
 		Suggester newDelegate = new Suggester();
 		newDelegate.init(delegateConfig, core);
-		delegates.put(fieldName, newDelegate);
+		delegates.put(fieldName + "_ir14_auto_complete", newDelegate);
+    suggestionFields.add(fieldName);
+
 	}
     
     return name;
@@ -169,7 +177,7 @@ public class SuggesterMK2 extends SolrSpellChecker {
   }
 
   static SpellingResult EMPTY_RESULT = new SpellingResult();
-  static String DELIMITER = "_";
+  static String DELIMITER = "\\(";
 
   @Override
   public SpellingResult getSuggestions(SpellingOptions options) throws IOException {
@@ -200,8 +208,13 @@ public class SuggesterMK2 extends SolrSpellChecker {
 		
   	    String target_field = field_value[0];
   	    String target_value = field_value[1];
+
+        String query_field = target_field;
+        if(target_field != null){
+          query_field = target_field + "_ir14_auto_complete";
+        }
   		  LOG.info("Delegate to field: " + target_field);
-  		  if (!delegates.containsKey(target_field)) {
+  		  if (!delegates.containsKey(query_field)) {
   			  LOG.info("No such field: " + target_field);
   			  break;
   		  }
@@ -213,7 +226,9 @@ public class SuggesterMK2 extends SolrSpellChecker {
     		LOG.info("new tokens: " + delegateOptions.tokens);
     		
     		// Get results from delegate
-    	    SpellingResult delegateResults = delegates.get(target_field).getSuggestions(delegateOptions);
+
+        LOG.info("\n\n" + query_field);
+    	  SpellingResult delegateResults = delegates.get(query_field).getSuggestions(delegateOptions);
     		for (Map.Entry<Token, LinkedHashMap<String, Integer>> entry : delegateResults.getSuggestions().entrySet()) {
     			for (Map.Entry<String, Integer> key_weight : entry.getValue().entrySet()) {
     				String key = target_field + ":\"" + key_weight.getKey() + "\"";
@@ -223,9 +238,9 @@ public class SuggesterMK2 extends SolrSpellChecker {
     		}
   	  } else {
   		// Autocomplete field name:
-          for (Map.Entry<String, Suggester> delegateEntry : delegates.entrySet()) {
-            if(delegateEntry.getKey().startsWith(scratch.toString())) {
-              suggestions.add(new LookupResult(delegateEntry.getKey() + ":\"", options.count));
+          for (String field : suggestionFields) {
+            if(field.startsWith(scratch.toString())) {
+              suggestions.add(new LookupResult(field + ":\"", options.count));
             }
           }
 		// Autocomplete field contents

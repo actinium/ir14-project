@@ -1404,7 +1404,13 @@
            org.apache.solr.spelling.suggest.jaspell.JaspellLookupFactory [default, jaspell-based]
            org.apache.solr.spelling.suggest.tst.TSTLookupFactory   [ternary trees]
       -->
-      <!--<str name="field">name</str>-->  <!-- the indexed field to derive suggestions from -->
+      <!-- used to define tokenizer -->
+      <str name="field">ir14_auto_complete</str>
+
+      <!-- specify what fields to enable suggestions for -->
+      <str name="field">name</str>
+      <str name="field">features</str>
+      
       <float name="threshold">0.005</float>
       <str name="buildOnCommit">true</str>
 <!--
