@@ -98,20 +98,32 @@ public class SuggesterMK2 extends SolrSpellChecker {
 
   private LookupFactory factory;
 
-  private Map<String,SchemaField> fields;
+  private Map<String, SchemaField> fields;
   
-  private Map<String, Suggester> delegates;
+  /*
+  private class Delegate {
+	public ArrayList<Suggester> targets;
+	public void add(Suggester target) {
+	  targets.
+	}
+  }
+  */
+  
+  private Map<String, List<Suggester> > delegates;
 
   private Set<String> suggestionFields;
   
+  private List<String> delimiters;
+  
   public SuggesterMK2() {
-	  delegates = new HashMap<String, Suggester>();
+	delegates = new HashMap<String, List<Suggester> >();
     suggestionFields = new HashSet<String>();
   }
   
   @Override
   public String init(NamedList config, SolrCore core) {
     LOG.info("init: " + config);
+    LOG.info("DELEGATE: " + config.get("delegate"));
     String name = super.init(config, core);
 	
 	// /* Remove these?
@@ -120,6 +132,12 @@ public class SuggesterMK2 extends SolrSpellChecker {
     sourceLocation = (String) config.get(LOCATION);
     lookupImpl = (String)config.get(LOOKUP_IMPL);
 	// */
+	
+	delimiters = config.getAll("delimiter");
+	if (delimiters == null) {
+		delimiters = new ArrayList<String>();
+		delimiters.add("\\(");
+	}
 	
 	// load fields map
     fields = core.getLatestSchema().getFields();
@@ -133,28 +151,35 @@ public class SuggesterMK2 extends SolrSpellChecker {
 	delegateBaseConfig.removeAll("classname");
 	delegateBaseConfig.add("classname", "org.apache.solr.spelling.suggest.Suggester");
 	
-	Collection<String> allFields = delegateBaseConfig.removeAll("field");
+	Collection<NamedList<String> > allFields = delegateBaseConfig.removeAll("delegate");
 	if (allFields == null) {
 		// No fields marked in solrconfig.xml
 		// Default to all fields in schema
-		allFields = new ArrayList<String>();
+		allFields = new ArrayList<NamedList<String> >();
 		for (String field : fields.keySet()) {
-		  allFields.add(field);
+			NamedList<String> delegatePair = new NamedList<String>();
+			delegatePair.add("targetField", field);
+			delegatePair.add("sourceField", field);
+			allFields.add(delegatePair);
 		}
 	}
-	for (String fieldName : allFields) {
-		LOG.info("Creating delegate for field: " + fieldName);
+	for (NamedList<String> fieldDelegation : allFields) {
+		String targetField = fieldDelegation.get("targetField");
+		LOG.info("Creating delegates for field: " + targetField);
 		
-		// Create configuration for this delegate suggester
-		NamedList delegateConfig = delegateBaseConfig.clone();
-		delegateConfig.add("field", fieldName + "_ir14_auto_complete");
-
+		delegates.put(targetField, new ArrayList<Suggester>());
 		
-		Suggester newDelegate = new Suggester();
-		newDelegate.init(delegateConfig, core);
-		delegates.put(fieldName + "_ir14_auto_complete", newDelegate);
-    suggestionFields.add(fieldName);
-
+		for (String sourceField : fieldDelegation.getAll("sourceField")) {
+			LOG.info("Creating delegate source: " + sourceField);
+			// Create configuration for this delegate suggester
+			NamedList delegateConfig = delegateBaseConfig.clone();
+			delegateConfig.add("field", sourceField);
+			
+			Suggester newSuggester = new Suggester();
+			newSuggester.init(delegateConfig, core);
+			delegates.get(targetField).add(newSuggester);
+			suggestionFields.add(targetField);
+		}
 	}
     
     return name;
@@ -163,22 +188,25 @@ public class SuggesterMK2 extends SolrSpellChecker {
   @Override
   public void build(SolrCore core, SolrIndexSearcher searcher) throws IOException {
     LOG.info("build()");
-	  for (Map.Entry<String, Suggester> entry : delegates.entrySet()) {
-	    entry.getValue().build(core, searcher);
+	for (Map.Entry<String, List<Suggester> > entry : delegates.entrySet()) {
+	  for (Suggester target : entry.getValue()) {
+		target.build(core, searcher);
 	  }
+	}
   } 
 
   @Override
   public void reload(SolrCore core, SolrIndexSearcher searcher) throws IOException {
     LOG.info("reload()");
-	  for (Map.Entry<String, Suggester> entry : delegates.entrySet()) {
-		  entry.getValue().reload(core, searcher);
+	for (Map.Entry<String, List<Suggester> > entry : delegates.entrySet()) {
+      for (Suggester target : entry.getValue()) {
+		target.reload(core, searcher);
 	  }
+	}
   }
 
   static SpellingResult EMPTY_RESULT = new SpellingResult();
-  static String DELIMITER = "\\(";
-
+  
   @Override
   public SpellingResult getSuggestions(SpellingOptions options) throws IOException {
     LOG.debug("getSuggestions (MK2): " + options.tokens);
@@ -197,66 +225,68 @@ public class SuggesterMK2 extends SolrSpellChecker {
       // List<LookupResult> suggestions = lookup.lookup(scratch, onlyMorePopular, options.count); // scratch = query (key).
       List<LookupResult> suggestions = new ArrayList<LookupResult>();
 	  
-  	  // Solr splits on the following characters automatically
-  	  // : ; , . + ( ) { } '
-  	  // so they can't be used as field delimiters
-  	  // - _ works
-  	  String[] field_value = scratch.toString().split(DELIMITER);
-  	  // or field_value.length > 1 ?
-  	  if (field_value.length == 2) {
-  		// Autocomplete field value:
-		
-  	    String target_field = field_value[0];
-  	    String target_value = field_value[1];
-
-        String query_field = target_field;
-        if(target_field != null){
-          query_field = target_field + "_ir14_auto_complete";
-        }
-  		  LOG.info("Delegate to field: " + target_field);
-  		  if (!delegates.containsKey(query_field)) {
-  			  LOG.info("No such field: " + target_field);
-  			  break;
-  		  }
-  		
-    		// Construct new options for delegate:
-    		ArrayList<Token> tokens = new ArrayList<Token>();
-    		tokens.add(new Token(target_value, 0, target_value.length()));
-    		SpellingOptions delegateOptions = new SpellingOptions(tokens, options.count);
-    		LOG.info("new tokens: " + delegateOptions.tokens);
-    		
-    		// Get results from delegate
-
-        LOG.info("\n\n" + query_field);
-    	  SpellingResult delegateResults = delegates.get(query_field).getSuggestions(delegateOptions);
-    		for (Map.Entry<Token, LinkedHashMap<String, Integer>> entry : delegateResults.getSuggestions().entrySet()) {
-    			for (Map.Entry<String, Integer> key_weight : entry.getValue().entrySet()) {
-    				String key = target_field + ":\"" + key_weight.getKey() + "\"";
-    				int weight = key_weight.getValue();
-    				suggestions.add(new LookupResult(key, weight));
-    			}
-    		}
-  	  } else {
-  		// Autocomplete field name:
-          for (String field : suggestionFields) {
-            if(field.startsWith(scratch.toString())) {
-              suggestions.add(new LookupResult(field + ":\"", options.count));
-            }
-          }
-		// Autocomplete field contents
-		// Copypasted code: TODO: merge with above
-		for (Map.Entry<String, Suggester> delegateEntry : delegates.entrySet()) {
-			// Get results from delegate
-    	    SpellingResult delegateResults = delegateEntry.getValue().getSuggestions(options);
-    		for (Map.Entry<Token, LinkedHashMap<String, Integer>> entry : delegateResults.getSuggestions().entrySet()) {
-    			for (Map.Entry<String, Integer> key_weight : entry.getValue().entrySet()) {
-    				String key = delegateEntry.getKey() + ":\"" + key_weight.getKey() + "\"";
-    				int weight = key_weight.getValue();
-    				suggestions.add(new LookupResult(key, weight));
-    			}
-    		}
-		}
-  	  }
+	  for (String delimiter : delimiters) {
+		  // Solr splits on the following characters automatically
+		  // : ; , . + ( ) { } '
+		  // so they can't be used as field delimiters
+		  // - _ works
+		  String[] field_value = scratch.toString().split(delimiter);
+		  // or field_value.length > 1 ?
+		  if (field_value.length == 2) {
+			// Autocomplete field value:
+			
+			String target_field = field_value[0];
+			String target_value = field_value[1];
+			
+			LOG.info("Delegate to field: " + target_field);
+			if (!delegates.containsKey(target_field)) {
+				LOG.info("No such field: " + target_field);
+				break;
+			}
+			  
+			// Construct new options for delegate:
+			ArrayList<Token> tokens = new ArrayList<Token>();
+			tokens.add(new Token(target_value, 0, target_value.length()));
+			SpellingOptions delegateOptions = new SpellingOptions(tokens, options.count);
+			LOG.info("new tokens: " + delegateOptions.tokens);
+			  
+			  // Get results from delegate
+			for (Suggester target : delegates.get(target_field)) {
+			  SpellingResult delegateResults = target.getSuggestions(delegateOptions);
+			  for (Map.Entry<Token, LinkedHashMap<String, Integer> > entry : delegateResults.getSuggestions().entrySet()) {
+				for (Map.Entry<String, Integer> key_weight : entry.getValue().entrySet()) {
+				  String key = target_field + ":\"" + key_weight.getKey() + "\"";
+				  int weight = key_weight.getValue();
+				  suggestions.add(new LookupResult(key, weight));
+				}
+			  }
+			}
+		  } else {
+			// Autocomplete field name:
+			for (String field : suggestionFields) {
+			  if(field.startsWith(scratch.toString())) {
+				suggestions.add(new LookupResult(field + ":\"", options.count));
+			  }
+			}
+			
+			// Autocomplete field contents
+			// Copypasted code: TODO: merge with above
+			for (Map.Entry<String, List<Suggester> > delegateEntry : delegates.entrySet()) {
+				// Get results from delegate
+				for (Suggester target : delegateEntry.getValue()) {
+					SpellingResult delegateResults = target.getSuggestions(options);
+					for (Map.Entry<Token, LinkedHashMap<String, Integer>> entry : delegateResults.getSuggestions().entrySet()) {
+						for (Map.Entry<String, Integer> key_weight : entry.getValue().entrySet()) {
+							String key = delegateEntry.getKey() + ":\"" + key_weight.getKey() + "\"";
+							int weight = key_weight.getValue();
+							suggestions.add(new LookupResult(key, weight));
+						}
+					}
+				}
+			}
+			
+		  }
+	  }
 
       if (suggestions == null) {
         continue;

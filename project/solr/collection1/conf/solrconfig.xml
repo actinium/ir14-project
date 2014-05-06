@@ -1404,12 +1404,21 @@
            org.apache.solr.spelling.suggest.jaspell.JaspellLookupFactory [default, jaspell-based]
            org.apache.solr.spelling.suggest.tst.TSTLookupFactory   [ternary trees]
       -->
-      <!-- used to define tokenizer -->
-      <str name="field">ir14_auto_complete</str>
-
-      <!-- specify what fields to enable suggestions for -->
-      <str name="field">name</str>
-      <str name="field">features</str>
+      
+	  <!-- Delimiters to use for splitting queries into
+	       field name/field values -->
+	  <str name="delimiter">:\(</str>
+	  <str name="delimiter">:</str>
+	  <str name="delimiter">\(</str>
+	  
+	  <!-- Define a single suggester for the field name,
+		   using the contents of the fields name and
+		   name_ir14_auto_complete -->
+	  <lst name="delegate">
+		<str name="targetField">name</str>
+		<str name="sourceField">name</str>
+		<str name="sourceField">name_ir14_auto_complete</str>
+	  </lst>
       
       <float name="threshold">0.005</float>
       <str name="buildOnCommit">true</str>
