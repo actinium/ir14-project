@@ -97,22 +97,9 @@ public class SuggesterMK2 extends SolrSpellChecker {
   protected SolrCore core;
 
   private LookupFactory factory;
-
-  private Map<String, SchemaField> fields;
-  
-  /*
-  private class Delegate {
-	public ArrayList<Suggester> targets;
-	public void add(Suggester target) {
-	  targets.
-	}
-  }
-  */
   
   private Map<String, List<Suggester> > delegates;
-
   private Set<String> suggestionFields;
-  
   private List<String> delimiters;
   
   public SuggesterMK2() {
@@ -139,13 +126,6 @@ public class SuggesterMK2 extends SolrSpellChecker {
 		delimiters.add("\\(");
 	}
 	
-	// load fields map
-    fields = core.getLatestSchema().getFields();
-    LOG.info("Loaded fields: ");
-    for(String field : fields.keySet()) {
-      LOG.info(field);
-    }
-	
 	// Create configuration with the parts common to all delegates:
 	NamedList delegateBaseConfig = config.clone();
 	delegateBaseConfig.removeAll("classname");
@@ -156,7 +136,7 @@ public class SuggesterMK2 extends SolrSpellChecker {
 		// No fields marked in solrconfig.xml
 		// Default to all fields in schema
 		allFields = new ArrayList<NamedList<String> >();
-		for (String field : fields.keySet()) {
+		for (String field : core.getLatestSchema().getFields().keySet()) {
 			NamedList<String> delegatePair = new NamedList<String>();
 			delegatePair.add("targetField", field);
 			delegatePair.add("sourceField", field);
@@ -255,7 +235,7 @@ public class SuggesterMK2 extends SolrSpellChecker {
 			  SpellingResult delegateResults = target.getSuggestions(delegateOptions);
 			  for (Map.Entry<Token, LinkedHashMap<String, Integer> > entry : delegateResults.getSuggestions().entrySet()) {
 				for (Map.Entry<String, Integer> key_weight : entry.getValue().entrySet()) {
-				  String key = target_field + ":\"" + key_weight.getKey() + "\"";
+				  String key = target_field + delimiter + key_weight.getKey();
 				  int weight = key_weight.getValue();
 				  suggestions.add(new LookupResult(key, weight));
 				}
@@ -265,7 +245,7 @@ public class SuggesterMK2 extends SolrSpellChecker {
 			// Autocomplete field name:
 			for (String field : suggestionFields) {
 			  if(field.startsWith(scratch.toString())) {
-				suggestions.add(new LookupResult(field + ":\"", options.count));
+				suggestions.add(new LookupResult(field + delimiter, options.count));
 			  }
 			}
 			
@@ -277,7 +257,7 @@ public class SuggesterMK2 extends SolrSpellChecker {
 					SpellingResult delegateResults = target.getSuggestions(options);
 					for (Map.Entry<Token, LinkedHashMap<String, Integer>> entry : delegateResults.getSuggestions().entrySet()) {
 						for (Map.Entry<String, Integer> key_weight : entry.getValue().entrySet()) {
-							String key = delegateEntry.getKey() + ":\"" + key_weight.getKey() + "\"";
+							String key = delegateEntry.getKey() + delimiter + key_weight.getKey();
 							int weight = key_weight.getValue();
 							suggestions.add(new LookupResult(key, weight));
 						}

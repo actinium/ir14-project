@@ -1410,6 +1410,8 @@
 	  <str name="delimiter">:\(</str>
 	  <str name="delimiter">:</str>
 	  <str name="delimiter">\(</str>
+	  <str name="delimiter">:"</str>
+	  <str name="delimiter">\("</str>
 	  
 	  <!-- Define a single suggester for the field name,
 		   using the contents of the fields name and
