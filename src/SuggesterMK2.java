@@ -241,7 +241,10 @@ public class SuggesterMK2 extends SolrSpellChecker {
 				}
 			  }
 			}
-		  } else {
+		  }
+		}
+		if (suggestions.isEmpty()) {
+			String delimiter = delimiters.get(0);
 			// Autocomplete field name:
 			for (String field : suggestionFields) {
 			  if(field.startsWith(scratch.toString())) {
@@ -264,9 +267,7 @@ public class SuggesterMK2 extends SolrSpellChecker {
 					}
 				}
 			}
-			
-		  }
-	  }
+	    }
 
       if (suggestions == null) {
         continue;
