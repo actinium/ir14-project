@@ -1398,49 +1398,60 @@
       <str name="name">suggest</str>
       <str name="classname">org.DD2476.SuggesterMK2</str>
       <str name="lookupImpl">org.apache.solr.spelling.suggest.tst.TSTLookupFactory</str>
-      <!-- Alternatives to lookupImpl:
-           org.apache.solr.spelling.suggest.fst.FSTLookupFactory   [finite state automaton]
-           org.apache.solr.spelling.suggest.fst.WFSTLookupFactory [weighted finite state automaton]
-           org.apache.solr.spelling.suggest.jaspell.JaspellLookupFactory [default, jaspell-based]
-           org.apache.solr.spelling.suggest.tst.TSTLookupFactory   [ternary trees]
+
+  	  <!--
+        Define delimiters to use for splitting queries into field name/field values.
+        If several are specified, it will return results using the same delimiter as
+        in the query. If no delimiter is used in the query, but a delimiter is to be
+        returned, the first delimiter specified below is used.
+
+        If no delimiter is specified, :" is used.
       -->
+      <str name="delimiter">:"</str>
+  	  <str name="delimiter">:\(</str>
+  	  <str name="delimiter">:</str>
+  	  <str name="delimiter">\(</str>
+  	  <str name="delimiter">\("</str>
 
-	  <!-- Delimiters to use for splitting queries into
-	       field name/field values -->
-    <str name="delimiter">:"</str>
-	  <str name="delimiter">:\(</str>
-	  <str name="delimiter">:</str>
-	  <str name="delimiter">\(</str>
-	  <str name="delimiter">\("</str>
+  	  <!--
+       Define suggesters for the fields you want to enable auto completion for.
+       Requires a target field, ie. the name of the field that is sent in the query.
+       If a source field is specified, it will be used to fetch suggestions from.
+       If left unspecified, the target field will be used.
+       Several source fields can be specified.
+       If no delegate is specified at all, every field will be used as target field
+       and source field respectively.
 
+       Example:
 
-	  <!-- Define suggesters for the fields you want
-         to enable auto completion for. Requires a
-         target field, ie. the name of the field that
-         is sent in the query.
-		   using the contents of the fields name and
-		   name_ir14_auto_complete -->
+       <lst name="delegate">
+         <str name="targetField">author</str>
+         <str name="sourceField">author</str>
+         <str name="sourceField">author_ir14_auto_complete</str>
+       </lst>
+       
+       The above will allow the user to get query completion for the field
+       author and will fetch suggestions from the fields author and
+       author_ir14_aut_complete.
+      -->
+      <!--
+        <lst name="delegate">
+          <str name="targetField">name</str>
+          <str name="sourceField">name</str>
+          <str name="sourceField">name_ir14_auto_complete</str>
+        </lst>
 
-    <!--
-	  <lst name="delegate">
-    <str name="targetField">features</str>
-    <str name="sourceField">features</str>
-    <str name="sourceField">features_ir14_auto_complete</str>
-	  </lst>
-
-    <lst name="delegate">
-    <str name="targetField">name</str>
-    <str name="sourceField">name</str>
-    <str name="sourceField">name_ir14_auto_complete</str>
-    </lst>-->
-
+    	  <lst name="delegate">
+          <str name="targetField">features</str>
+          <str name="sourceField">features</str>
+          <str name="sourceField">features_ir14_auto_complete</str>
+    	  </lst>
+      -->
       <float name="threshold">0.005</float>
       <str name="buildOnCommit">true</str>
-<!--
-      <str name="sourceLocation">american-english</str>
--->
     </lst>
   </searchComponent>
+
   <requestHandler class="org.apache.solr.handler.component.SearchHandler" name="/suggest">
     <lst name="defaults">
       <str name="spellcheck">true</str>
