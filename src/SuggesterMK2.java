@@ -26,6 +26,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -239,7 +240,9 @@ public class SuggesterMK2 extends SolrSpellChecker {
         // Autocomplete field name:
         for (String field : suggestionFields) {
           if(field.startsWith(scratch.toString())) {
-            suggestions.add(new LookupResult(field + delimiter, options.count));
+            // Sort field completions first
+			  long weight = Long.MAX_VALUE;
+		      suggestions.add(new LookupResult(field + delimiter, weight));
           }
         }
 
@@ -254,10 +257,62 @@ public class SuggesterMK2 extends SolrSpellChecker {
       if (suggestions == null) {
         continue;
       }
-      if (options.suggestMode != SuggestMode.SUGGEST_MORE_POPULAR) {
+      if (options.suggestMode == SuggestMode.SUGGEST_MORE_POPULAR) {
+		// Sort lexically to merge duplicates
+		Collections.sort(suggestions);
+		
+		List<LookupResult> newSuggestions = new ArrayList<LookupResult>();
+		// Merge duplicate results and add their weights
+		// together.
+		// TODO: is there a better way to do this?
+		// prevResult is the last result with the same
+		// key as the current
+		LookupResult prevResult = null;
+		long cumValue = 0;
+		for (LookupResult lr : suggestions) {
+		  if (prevResult != null && lr.key.equals(prevResult.key)) {
+		    cumValue += lr.value;
+		  } else {
+		    if (prevResult != null) {
+			  cumValue += prevResult.value;
+			  newSuggestions.add(new LookupResult(prevResult.key, cumValue));
+			  cumValue = 0;
+			}
+		    prevResult = lr;
+		  }
+		}
+		if (prevResult != null) {
+		  cumValue += prevResult.value;
+		  newSuggestions.add(new LookupResult(prevResult.key, cumValue));
+		}
+		suggestions = newSuggestions;
+		
+		// Sort by weight
+		Collections.sort(suggestions,
+		  new Comparator<LookupResult>() {
+		    public int compare(LookupResult a, LookupResult b) {
+			  // value (weight) is long
+			  
+			  // This doesn't work unless difference fits in int:
+		      // XXX: return (int)(b.value - a.value)
+			  
+			  // Do it the stupid way:
+			  if (a.value < b.value) {
+				return 1;
+			  } else if (a.value > b.value) {
+				return -1;
+			  } else {
+				return 0;
+			  }
+		    }
+		  }
+	    );
+	  } else {
+		LOG.info("Sorting: ");
         Collections.sort(suggestions);
       }
       for (LookupResult lr : suggestions) {
+		LOG.info("Result: " + lr.key + " (weight: " + lr.value + ")");
         res.add(t, lr.key.toString(), (int)lr.value);
       }
     }
