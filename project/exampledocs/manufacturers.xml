@@ -42,6 +42,16 @@
     <field name="address_s">12045 E. Waterfront Drive Playa Vista, CA 90094</field>
   </doc>
   <doc>
+    <field name="id">beats</field>
+    <field name="compName_s">Beats Electronics LLC</field>
+    <field name="address_s">7582 Las vegas Blvd. S, NV 89123-1009</field>
+  </doc>
+  <doc>
+    <field name="id">bose</field>
+    <field name="compName_s">Bose Corporation</field>
+    <field name="address_s">The Mountain Farmingham, MA 01701</field>
+  </doc>
+  <doc>
     <field name="id">canon</field>
     <field name="compName_s">Canon, Inc.</field>
     <field name="address_s">One Canon Plaza Lake Success, NY 11042</field>
@@ -52,14 +62,59 @@
     <field name="address_s">46221 Landing Parkway Fremont, CA 94538</field>
   </doc>
   <doc>
+    <field name="id">cm</field>
+    <field name="compName_s">Cooler Master Co. Ltd.</field>
+    <field name="address_s">8F, No. 788-1, ZhongZheng Rd.,Zhongehe Dist.,New Taipei City 23586</field>
+  </doc>
+  <doc>
     <field name="id">dell</field>
     <field name="compName_s">Dell, Inc.</field>
     <field name="address_s">One Dell Way Round Rock, Texas 78682</field>
   </doc>
   <doc>
+    <field name="id">dlink</field>
+    <field name="compName_s">D-Link Corporation</field>
+    <field name="address_s">173595 Mt Herrmann St Fountain Valley, CA 92708</field>
+  </doc>
+  <doc>
+    <field name="id">foxconn</field>
+    <field name="compName_s">Foxconn Technology Co. Ltd</field>
+    <field name="address_s">105 S. Puente Street Brea, CA 92821</field>
+  </doc>
+  <doc>
+    <field name="id">gigabyte</field>
+    <field name="compName_s">Gigabyte Technology Co. Ltd.</field>
+    <field name="address_s">No.6, Bao Chiang Road, Hsin-Tien Dist., New Taipei City 231,Taiwan</field>
+  </doc>
+  <doc>
+    <field name="id">hp</field>
+    <field name="compName_s">Hewlett Packard Corporation</field>
+    <field name="address_s">5200 Blue Lagoon Drive Suite 950, Florida 33126</field>
+  </doc>
+  <doc>
+    <field name="id">hitachi</field>
+    <field name="compName_s">Hitachi Data Systems</field>
+    <field name="address_s">2845 Lafayette Street, CA 95050-2639</field>
+  </doc>
+  <doc>
+    <field name="id">ibm</field>
+    <field name="compName_s">IBM Corporation</field>
+    <field name="address_s">1 New Orchard Road Armonk, New York 10504-1722 </field>
+  </doc>
+  <doc>
+    <field name="id">intel</field>
+    <field name="compName_s">Hitachi Data Systems</field>
+    <field name="address_s">2200 Mission College Blvd., CA 95054-1549</field>
+  </doc>
+  <doc>
     <field name="id">maxtor</field>
     <field name="compName_s">Maxtor Corporation</field>
     <field name="address_s">920 Disc Drive Scotts Valley, CA 95066</field>
+  </doc>
+  <doc>
+    <field name="id">nvidia</field>
+    <field name="compName_s">Nvidia Corporation</field>
+    <field name="address_s">2701 San Tomas Expressway, CA 95050</field>
   </doc>
   <doc>
     <field name="id">samsung</field>

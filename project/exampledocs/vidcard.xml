@@ -59,4 +59,92 @@
   <!-- NYC store -->
   <field name="store">40.7143,-74.006</field>
 </doc>
+
+<doc>
+  <field name="id">N780TF3GD5/OC</field>
+  <field name="name">MSI GeForce GTX 780 3GB OC TwinFrozr Gaming-series </field>
+  <field name="manu">Nvidia Corporation</field>
+  <!-- Join -->
+  <field name="manu_id_s">nvidia</field>
+  <field name="cat">electronics</field>
+  <field name="cat">graphics card</field>
+  <field name="features">Nvidia GTX 780 GPU clocked at 954MHz</field>
+  <field name="features">3 GB GDDR5 SDRAM clocked at 6GHz</field>
+  <field name="features">PCI Express 3.0 x16</field>
+  <field name="features">dual DVI, HDMI, DisplayPort</field>
+  <field name="features">OpenGL 4.0, DirectX 11.1</field>
+  <field name="weight">65</field>
+  <field name="price">599.99</field>
+  <field name="popularity">8</field>
+  <field name="inStock">true</field>
+  <field name="manufacturedate_dt">2014-02-13T20:26:37Z/DAY</field>
+  <!-- NYC store -->
+  <field name="store">40.7143,-74.006</field>
+</doc>
+
+<doc>
+  <field name="id">R9280X-DC2T-3GD5</field>
+  <field name="name">ASUS Radeon R9 280X 3GB DirectCUII TOP</field>
+  <field name="manu">ATI Technologies</field>
+  <!-- Join -->
+  <field name="manu_id_s">ati</field>
+  <field name="cat">electronics</field>
+  <field name="cat">graphics card</field>
+  <field name="features">ATI RADEON R9 280X GPU clocked at 970MHz</field>
+  <field name="features">3GB GDDR5 SDRAM clocked at 6.4GHz</field>
+  <field name="features">PCI Express 3.0 x16</field>
+  <field name="features">dual DVI, HDMI, DisplayPort</field>
+  <field name="features">OpenGL 4.0, DirectX 11.2</field>
+  <field name="weight">48</field>
+  <field name="price">399.99</field>
+  <field name="popularity">8</field>
+  <field name="inStock">true</field>
+  <field name="manufacturedate_dt">2013-07-18T15:26:37Z/DAY</field>
+  <!-- NYC store -->
+  <field name="store">40.7143,-74.006</field>
+</doc>
+<doc>
+  <field name="id">21226-00-40G</field>
+  <field name="name">Sapphire Radeon R9 290X 4GB (Hawaii XT)</field>
+  <field name="manu">ATI Technologies</field>
+  <!-- Join -->
+  <field name="manu_id_s">ati</field>
+  <field name="cat">electronics</field>
+  <field name="cat">graphics card</field>
+  <field name="features">Sapphire Radeon R9 290X GPU clocked at 1000MHz</field>
+  <field name="features">4GB GDDR5 SDRAM clocked at 5GHz</field>
+  <field name="features">PCI Express 3.0 x16</field>
+  <field name="features">dual DVI, HDMI, DisplayPort</field>
+  <field name="features">OpenGL 4.0, DirectX 11.2</field>
+  <field name="weight">48</field>
+  <field name="price">599.99</field>
+  <field name="popularity">9</field>
+  <field name="inStock">false</field>
+  <field name="manufacturedate_dt">2013-10-20T15:26:37Z/DAY</field>
+  <!-- NYC store -->
+  <field name="store">40.7143,-74.006</field>
+</doc>
+
+<doc>
+  <field name="id">GV-N660OC-2GD</field>
+  <field name="name">Gigabyte GeForce GTX 660</field>
+  <field name="manu">Nvidia Corporation</field>
+  <!-- Join -->
+  <field name="manu_id_s">nvidia</field>
+  <field name="cat">electronics</field>
+  <field name="cat">graphics card</field>
+  <field name="features">Nvidia Geforce GTX 660 GPU clocked at 1033MHz</field>
+  <field name="features">2 GB GDDR5 SDRAM clocked at 6GHz</field>
+  <field name="features">PCI Express 3.0 x16</field>
+  <field name="features">dual DVI, HDMI, DisplayPort</field>
+  <field name="features">OpenGL 4.0, DirectX 11</field>
+  <field name="weight">65</field>
+  <field name="price">299.99</field>
+  <field name="popularity">6</field>
+  <field name="inStock">true</field>
+  <field name="manufacturedate_dt">2013-06-01T20:26:37Z/DAY</field>
+  <!-- NYC store -->
+  <field name="store">40.7143,-74.006</field>
+</doc>
+
 </add>
