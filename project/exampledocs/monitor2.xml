@@ -15,19 +15,51 @@
  limitations under the License.
 -->
 
-<add><doc>
-  <field name="id">VA902B</field>
-  <field name="name">ViewSonic VA902B - flat panel display - TFT - 19"</field>
-  <field name="manu">ViewSonic Corp.</field>
-  <!-- Join -->
-  <field name="manu_id_s">viewsonic</field>
-  <field name="cat">electronics and stuff2</field>
-  <field name="features">19" TFT active matrix LCD, 8ms response time, 1280 x 1024 native resolution</field>
-  <field name="weight">190.4</field>
-  <field name="price">279.95</field>
-  <field name="popularity">6</field>
-  <field name="inStock">true</field>
-  <!-- Buffalo store -->
-  <field name="store">45.18814,-93.88541</field>
-</doc></add>
+<add>
+  <doc>
+    <field name="id">VA902B</field>
+    <field name="name">ViewSonic VA902B - flat panel display - TFT - 19"</field>
+    <field name="manu">ViewSonic Corp.</field>
+    <!-- Join -->
+    <field name="manu_id_s">viewsonic</field>
+    <field name="cat">monitors</field>
+    <field name="features">19" TFT active matrix LCD, 8ms response time, 1280 x 1024 native resolution</field>
+    <field name="weight">190.4</field>
+    <field name="price">279.95</field>
+    <field name="popularity">6</field>
+    <field name="inStock">true</field>
+    <!-- Buffalo store -->
+    <field name="store">45.18814,-93.88541</field>
+  </doc>
+  <doc>
+    <field name="id">9H.LA4LB.RBE</field>
+    <field name="name">BenQ 27" XL2720Z LED 144Hz</field>
+    <field name="manu">BenQ Corporation</field>
+    <!-- Join -->
+    <field name="manu_id_s">benq</field>
+    <field name="cat">monitors</field>
+    <field name="features">27" LED, 1 ms response time, 1920 x 1080 native resolution</field>
+    <field name="weight">7500.0</field>
+    <field name="price">399.99</field>
+    <field name="popularity">8</field>
+    <field name="inStock">false</field>
+    <!-- Buffalo store -->
+    <field name="store">45.18814,-93.88541</field>
+  </doc>
+  <doc>
+    <field name="id">PB278Q</field>
+    <field name="name">ASUS 27" PB278Q</field>
+    <field name="manu">ASUS Computer</field>
+    <!-- Join -->
+    <field name="manu_id_s">asus</field>
+    <field name="cat">monitors</field>
+    <field name="features">27" LED, 5 ms response time, 2560 x 1440 native resolution</field>
+    <field name="weight">8800.0</field>
+    <field name="price">399.99</field>
+    <field name="popularity">9</field>
+    <field name="inStock">true</field>
+    <!-- Buffalo store -->
+    <field name="store">45.18814,-93.88541</field>
+  </doc>
+</add>
 

@@ -52,6 +52,11 @@
     <field name="address_s">The Mountain Farmingham, MA 01701</field>
   </doc>
   <doc>
+    <field name="id">benq</field>
+    <field name="compName_s">BenQ Corporation</field>
+    <field name="address_s">3200 Park Center Drive, CA 92626 USA</field>
+  </doc>
+  <doc>
     <field name="id">canon</field>
     <field name="compName_s">Canon, Inc.</field>
     <field name="address_s">One Canon Plaza Lake Success, NY 11042</field>
@@ -105,6 +110,11 @@
     <field name="id">intel</field>
     <field name="compName_s">Hitachi Data Systems</field>
     <field name="address_s">2200 Mission College Blvd., CA 95054-1549</field>
+  </doc>
+  <doc>
+    <field name="id">logitech</field>
+    <field name="compName_s">Logitech International S.A</field>
+    <field name="address_s">7600 Gateway Blvd. Newark, CA 94560</field>
   </doc>
   <doc>
     <field name="id">maxtor</field>
