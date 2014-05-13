@@ -242,6 +242,7 @@ public class SuggesterMK2 extends SolrSpellChecker {
     if(index != -1){
       queryString = queryString.substring(0, index);
     }
+    if(queryString.length() > 0) queryString += " ";
     return queryString;
   }
 
@@ -275,7 +276,6 @@ public class SuggesterMK2 extends SolrSpellChecker {
 
       Query query = getField(options.tokens);
       String prefix = getPrefix(getQuery(options.tokens), query);
-      LOG.info(prefix);
       String targetField = query.field;
       String scratch = query.value;
       if(scratch == null) return res;
@@ -319,7 +319,7 @@ public class SuggesterMK2 extends SolrSpellChecker {
         LOG.info("new tokens: " + delegateOptions.tokens);
 
         // Get results from delegate
-        suggestions.addAll(getSuggestions(delegates.get(targetField), delegateOptions, prefix + " " +targetField + delimiter));
+        suggestions.addAll(getSuggestions(delegates.get(targetField), delegateOptions, prefix+targetField + delimiter));
       } else {
       // If it didn't match a field
         // Autocomplete field name:
@@ -327,7 +327,7 @@ public class SuggesterMK2 extends SolrSpellChecker {
           if(field.startsWith(scratch.toString())) {
             // Sort field completions first
 			  long weight = Long.MAX_VALUE;
-		      suggestions.add(new LookupResult(field + delimiter, weight));
+		      suggestions.add(new LookupResult(prefix + field + delimiter, weight));
           }
         }
 
