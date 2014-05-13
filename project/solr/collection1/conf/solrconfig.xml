@@ -1437,10 +1437,19 @@
         <str name="sourceField">name_ir14_auto_complete</str>
       </lst>
 
+      <lst name="delegate">
+        <str name="targetField">party</str>
+        <str name="sourceField">party</str>
+      </lst>
+
+      <lst name="delegate">
+        <str name="targetField">birthyear</str>
+        <str name="sourceField">birthyear</str>
+      </lst>
+
   	  <lst name="delegate">
-        <str name="targetField">features</str>
-        <str name="sourceField">features</str>
-        <str name="sourceField">features_ir14_auto_complete</str>
+        <str name="targetField">block</str>
+        <str name="sourceField">block</str>
   	  </lst>
       <float name="threshold">0.005</float>
       <str name="buildOnCommit">true</str>
