@@ -1408,10 +1408,7 @@
         If no delimiter is specified, :" is used.
       -->
       <str name="delimiter">:"</str>
-  	  <str name="delimiter">:\(</str>
-  	  <str name="delimiter">:</str>
-  	  <str name="delimiter">\(</str>
-  	  <str name="delimiter">\("</str>
+      <str name="endDelimiter">"</str>
 
   	  <!--
        Define suggesters for the fields you want to enable auto completion for.
@@ -1429,24 +1426,22 @@
          <str name="sourceField">author</str>
          <str name="sourceField">author_ir14_auto_complete</str>
        </lst>
-       
+
        The above will allow the user to get query completion for the field
        author and will fetch suggestions from the fields author and
        author_ir14_aut_complete.
       -->
-      <!--
-        <lst name="delegate">
-          <str name="targetField">name</str>
-          <str name="sourceField">name</str>
-          <str name="sourceField">name_ir14_auto_complete</str>
-        </lst>
+      <lst name="delegate">
+        <str name="targetField">name</str>
+        <str name="sourceField">name</str>
+        <str name="sourceField">name_ir14_auto_complete</str>
+      </lst>
 
-    	  <lst name="delegate">
-          <str name="targetField">features</str>
-          <str name="sourceField">features</str>
-          <str name="sourceField">features_ir14_auto_complete</str>
-    	  </lst>
-      -->
+  	  <lst name="delegate">
+        <str name="targetField">features</str>
+        <str name="sourceField">features</str>
+        <str name="sourceField">features_ir14_auto_complete</str>
+  	  </lst>
       <float name="threshold">0.005</float>
       <str name="buildOnCommit">true</str>
     </lst>

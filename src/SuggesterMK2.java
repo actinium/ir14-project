@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
+import java.util.Iterator;
 
 
 import org.apache.lucene.analysis.Token;
@@ -101,7 +102,8 @@ public class SuggesterMK2 extends SolrSpellChecker {
 
   private Map<String, List<Suggester> > delegates;
   private Set<String> suggestionFields;
-  private List<String> delimiters;
+  private String delimiter;
+  private String endDelimiter;
 
   public SuggesterMK2() {
     delegates = new HashMap<String, List<Suggester> >();
@@ -121,10 +123,14 @@ public class SuggesterMK2 extends SolrSpellChecker {
     lookupImpl = (String)config.get(LOOKUP_IMPL);
     // */
 
-    delimiters = config.getAll("delimiter");
-    if (delimiters == null || delimiters.size() == 0) {
-      delimiters = new ArrayList<String>();
-      delimiters.add("\\(");
+    delimiter = (String) config.get("delimiter");
+    if (delimiter == null) {
+      delimiter = ("\\:\"");
+    }
+
+    endDelimiter = (String) config.get("endDelimiter");
+    if(endDelimiter == null){
+      endDelimiter = "\"";
     }
 
     // Create configuration with the parts common to all delegates:
@@ -188,55 +194,106 @@ public class SuggesterMK2 extends SolrSpellChecker {
 
   static SpellingResult EMPTY_RESULT = new SpellingResult();
 
+  private Query getField(Collection<Token> tokens){
+    Query query = new Query();
+    // Iterator over each token
+    for(Token token : tokens){
+
+      String scratch = getScratch(token);
+      // Split on field query completion syntax delimiter :"
+      String[] fieldValues = scratch.split(delimiter);
+      // If such syntax is used, identify the field
+      if (fieldValues.length == 2) {
+
+        query.field = fieldValues[0];
+        query.value = fieldValues[1];
+
+        if(query.value.indexOf("\"") != -1){
+          query.field = null;
+          query.value = null;
+        }
+      } else {
+        if(scratch.indexOf("\"") != -1){
+          query.field = null;
+          query.value = null;
+        } else {
+          if(query.value == null){
+            query.value = scratch;
+          } else {
+            query.value += " " + scratch;
+          }
+        }
+      }
+    }
+    return query;
+  }
+
+  private String getScratch(Token token){
+    CharsRef scratch = new CharsRef();
+    scratch.chars = token.buffer();
+    scratch.offset = 0;
+    scratch.length = token.length();
+    return scratch.toString();
+  }
+
+
+
+  class Query {
+    String field;
+    String value;
+  }
+
   @Override
   public SpellingResult getSuggestions(SpellingOptions options) throws IOException {
     LOG.debug("getSuggestions (MK2): " + options.tokens);
 
-    SpellingResult res = new SpellingResult();
-    CharsRef scratch = new CharsRef();
-    for (Token t : options.tokens) {
-      scratch.chars = t.buffer();
-      scratch.offset = 0;
-      scratch.length = t.length();
+      SpellingResult res = new SpellingResult();
+
+      Query query = getField(options.tokens);
+      String targetField = query.field;
+      String scratch = query.value;
+      LOG.info("Query: " + targetField + ", " + scratch);
+      Token t = null;
+      for(Token token : options.tokens){
+        t = token;
+      }
 
       // LOG.debug("CharsRef: " + scratch.toString());
       boolean onlyMorePopular = (options.suggestMode == SuggestMode.SUGGEST_MORE_POPULAR);
       // List<LookupResult> suggestions = lookup.lookup(scratch, onlyMorePopular, options.count); // scratch = query (key).
       List<LookupResult> suggestions = new ArrayList<LookupResult>();
 
-      for (String delimiter : delimiters) {
-        // Solr splits on the following characters automatically
-        // : ; , . + ( ) { } '
-        // so they can't be used as field delimiters
-        // - _ works
-        String[] field_value = scratch.toString().split(delimiter);
-        // or field_value.length > 1 ?
-        if (field_value.length == 2) {
-          // Autocomplete field value:
+      // Solr splits on the following characters automatically
+      // : ; , . + ( ) { } '
+      // so they can't be used as field delimiters
+      // - _ works
 
-          String target_field = field_value[0];
-          String target_value = field_value[1];
+      LOG.info("Targetfield: " + targetField);
 
-          LOG.info("Delegate to field: " + target_field);
-          if (!delegates.containsKey(target_field)) {
-            LOG.info("No such field: " + target_field);
-            break;
-          }
-
-          // Construct new options for delegate:
-          ArrayList<Token> tokens = new ArrayList<Token>();
-          tokens.add(new Token(target_value, 0, target_value.length()));
-          SpellingOptions delegateOptions = new SpellingOptions(tokens, options.count);
-          LOG.info("new tokens: " + delegateOptions.tokens);
-
-          // Get results from delegate
-          suggestions.addAll(getSuggestions(delegates.get(target_field), delegateOptions, target_field + delimiter));
+      // or field_value.length > 1 ?
+      if (targetField != null) {
+        // Autocomplete field value:
+        String targetValue = scratch;
+        if(targetValue.startsWith(targetField)){
+          targetValue = targetValue.split(delimiter)[1];
         }
-      }
 
-      // If it didn't match a field.
-      if (suggestions.isEmpty()) {
-        String delimiter = delimiters.get(0);
+        LOG.info("Delegate to field: " + targetField);
+        if (!delegates.containsKey(targetField)) {
+          LOG.info("No such field: " + targetField);
+          return res;
+        }
+
+        // Construct new options for delegate:
+        ArrayList<Token> tokens = new ArrayList<Token>();
+        tokens.add(new Token(targetValue, 0, targetValue.length()));
+        SpellingOptions delegateOptions = new SpellingOptions(tokens, options.count);
+        LOG.info("new tokens: " + delegateOptions.tokens);
+
+        // Get results from delegate
+        suggestions.addAll(getSuggestions(delegates.get(targetField), delegateOptions, targetField + delimiter));
+      } else {
+      // If it didn't match a field
         // Autocomplete field name:
         for (String field : suggestionFields) {
           if(field.startsWith(scratch.toString())) {
@@ -254,9 +311,10 @@ public class SuggesterMK2 extends SolrSpellChecker {
         }
       }
 
-      if (suggestions == null) {
-        continue;
-      }
+
+      
+      
+      
       if (options.suggestMode == SuggestMode.SUGGEST_MORE_POPULAR) {
 		// Sort lexically to merge duplicates
 		Collections.sort(suggestions);
@@ -308,14 +366,13 @@ public class SuggesterMK2 extends SolrSpellChecker {
 		  }
 	    );
 	  } else {
-		LOG.info("Sorting: ");
+		    LOG.info("Sorting: ");
         Collections.sort(suggestions);
       }
       for (LookupResult lr : suggestions) {
 		LOG.info("Result: " + lr.key + " (weight: " + lr.value + ")");
         res.add(t, lr.key.toString(), (int)lr.value);
       }
-    }
     return res;
   }
 
