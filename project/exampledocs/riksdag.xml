@@ -1,281 +1,282 @@
-<doc>
-  <add>
+<add>
+  <doc>
+    <field name="id">1</field>
     <field name="birthyear">1971</field>
     <field name="name">Mikael Damberg</field>
     <field name="party">S</field>
     <field name="constituency">Stockholms län</field>
     <field name="status">Tjänstgörande riksdagsledamot</field>
-  </add>
-  
-  <add>
+  </doc>  
+  <doc>
+    <field name="id">2</field>
     <field name="birthyear">1941</field>
     <field name="name">Rune Wikström</field>
     <field name="party">M</field>
     <field name="constituency">Stockholms län</field>
     <field name="status">Tjänstgörande riksdagsledamot</field>
-  </add>
-  
-  <add>
+  </doc>  
+  <doc>
+    <field name="id">3</field>
     <field name="birthyear">1981</field>
     <field name="name">Fredrik Schulte</field>
     <field name="party">M</field>
     <field name="constituency">Stockholms län</field>
     <field name="status">Tjänstgörande riksdagsledamot</field>
-  </add>
-  
-  <add>
+  </doc>  
+  <doc>
+    <field name="id">4</field>
     <field name="birthyear">1959</field>
     <field name="name">Désirée Pethrus</field>
     <field name="party">KD</field>
     <field name="constituency">Stockholms län</field>
     <field name="status">Tjänstgörande riksdagsledamot</field>
-  </add>
-  
-  <add>
+  </doc>  
+  <doc>
+    <field name="id">5</field>
     <field name="birthyear">1955</field>
     <field name="name">Kerstin Lundgren</field>
     <field name="party">C</field>
     <field name="constituency">Stockholms län</field>
     <field name="status">Tjänstgörande riksdagsledamot</field>
-  </add>
-  
-  <add>
+  </doc>  
+  <doc>
+    <field name="id">6</field>
     <field name="birthyear">1960</field>
     <field name="name">Göran Pettersson</field>
     <field name="party">M</field>
     <field name="constituency">Stockholms län</field>
     <field name="status">Tjänstgörande riksdagsledamot</field>
-  </add>
-  
-  <add>
+  </doc>  
+  <doc>
+    <field name="id">7</field>
     <field name="birthyear">1961</field>
     <field name="name">Nina Lundström</field>
     <field name="party">FP</field>
     <field name="constituency">Stockholms län</field>
     <field name="status">Tjänstgörande riksdagsledamot</field>
-  </add>
-  
-  <add>
+  </doc>  
+  <doc>
+    <field name="id">8</field>
     <field name="birthyear">1957</field>
     <field name="name">Lars Ohly</field>
     <field name="party">V</field>
     <field name="constituency">Stockholms län</field>
     <field name="status">Tjänstgörande riksdagsledamot</field>
-  </add>
-  
-  <add>
+  </doc>  
+  <doc>
+    <field name="id">9</field>
     <field name="birthyear">1958</field>
     <field name="name">Anti Avsan</field>
     <field name="party">M</field>
     <field name="constituency">Stockholms län</field>
     <field name="status">Tjänstgörande riksdagsledamot</field>
-  </add>
-  
-  <add>
+  </doc>  
+  <doc>
+    <field name="id">10</field>
     <field name="birthyear">1977</field>
     <field name="name">Karl Sigfrid</field>
     <field name="party">M</field>
     <field name="constituency">Stockholms län</field>
     <field name="status">Tjänstgörande riksdagsledamot</field>
-  </add>
-  
-  <add>
+  </doc>  
+  <doc>
+    <field name="id">11</field>
     <field name="birthyear">1947</field>
     <field name="name">Mats Odell</field>
     <field name="party">KD</field>
     <field name="constituency">Stockholms län</field>
     <field name="status">Tjänstgörande riksdagsledamot</field>
-  </add>
-  
-  <add>
+  </doc>  
+  <doc>
+    <field name="id">12</field>
     <field name="birthyear">1954</field>
     <field name="name">Mats Pertoft</field>
     <field name="party">MP</field>
     <field name="constituency">Stockholms län</field>
     <field name="status">Tjänstgörande riksdagsledamot</field>
-  </add>
-  
-  <add>
+  </doc>  
+  <doc>
+    <field name="id">13</field>
     <field name="birthyear">1958</field>
     <field name="name">Peter Eriksson</field>
     <field name="party">MP</field>
     <field name="constituency">Stockholms län</field>
     <field name="status">Tjänstgörande riksdagsledamot</field>
-  </add>
-  
-  <add>
+  </doc>  
+  <doc>
+    <field name="id">14</field>
     <field name="birthyear">1970</field>
     <field name="name">Anna Kinberg Batra</field>
     <field name="party">M</field>
     <field name="constituency">Stockholms län</field>
     <field name="status">Tjänstgörande riksdagsledamot</field>
-  </add>
-  
-  <add>
+  </doc>  
+  <doc>
+    <field name="id">15</field>
     <field name="birthyear">1970</field>
     <field name="name">Amineh Kakabaveh</field>
     <field name="party">V</field>
     <field name="constituency">Stockholms län</field>
     <field name="status">Tjänstgörande riksdagsledamot</field>
-  </add>
-  
-  <add>
+  </doc>  
+  <doc>
+    <field name="id">16</field>
     <field name="birthyear">1956</field>
     <field name="name">Edip Noyan</field>
     <field name="party">M</field>
     <field name="constituency">Stockholms län</field>
     <field name="status">Tjänstgörande statsrådsersättare</field>
-  </add>
-  
-  <add>
+  </doc>  
+  <doc>
+    <field name="id">17</field>
     <field name="birthyear">1978</field>
     <field name="name">Eliza Roszkowska Öberg</field>
     <field name="party">M</field>
     <field name="constituency">Stockholms län</field>
     <field name="status">Tjänstgörande riksdagsledamot</field>
-  </add>
-  
-  <add>
+  </doc>  
+  <doc>
+    <field name="id">18</field>
     <field name="birthyear">1951</field>
     <field name="name">Marietta de Pourbaix-Lundin</field>
     <field name="party">M</field>
     <field name="constituency">Stockholms län</field>
     <field name="status">Tjänstgörande riksdagsledamot</field>
-  </add>
-  
-  <add>
+  </doc>  
+  <doc>
+    <field name="id">19</field>
     <field name="birthyear">1987</field>
     <field name="name">Hanif Bali</field>
     <field name="party">M</field>
     <field name="constituency">Stockholms län</field>
     <field name="status">Tjänstgörande riksdagsledamot</field>
-  </add>
-  
-  <add>
+  </doc>  
+  <doc>
+    <field name="id">20</field>
     <field name="birthyear">1981</field>
     <field name="name">Kent Ekeroth</field>
     <field name="party">SD</field>
     <field name="constituency">Stockholms län</field>
     <field name="status">Tjänstgörande riksdagsledamot</field>
-  </add>
-  
-  <add>
+  </doc>  
+  <doc>
+    <field name="id">21</field>
     <field name="birthyear">1976</field>
     <field name="name">Björn Söder</field>
     <field name="party">SD</field>
     <field name="constituency">Stockholms län</field>
     <field name="status">Tjänstgörande riksdagsledamot</field>
-  </add>
-  
-  <add>
+  </doc>  
+  <doc>
+    <field name="id">22</field>
     <field name="birthyear">1962</field>
     <field name="name">Ingela Nylund Watz</field>
     <field name="party">S</field>
     <field name="constituency">Stockholms län</field>
     <field name="status">Tjänstgörande riksdagsledamot</field>
-  </add>
-  
-  <add>
+  </doc>  
+  <doc>
+    <field name="id">23</field>
     <field name="birthyear">1978</field>
     <field name="name">Ardalan Shekarabi</field>
     <field name="party">S</field>
     <field name="constituency">Stockholms län</field>
     <field name="status">Tjänstgörande riksdagsledamot</field>
-  </add>
-  
-  <add>
+  </doc>  
+  <doc>
+    <field name="id">24</field>
     <field name="birthyear">1972</field>
     <field name="name">Metin Ataseven</field>
     <field name="party">M</field>
     <field name="constituency">Stockholms län</field>
     <field name="status">Tjänstgörande riksdagsledamot</field>
-  </add>
-  
-  <add>
+  </doc>  
+  <doc>
+    <field name="id">25</field>
     <field name="birthyear">1971</field>
     <field name="name">Sedat Dogru</field>
     <field name="party">M</field>
     <field name="constituency">Stockholms län</field>
     <field name="status">Tjänstgörande ersättare</field>
-  </add>
-  
-  <add>
+  </doc>  
+  <doc>
+    <field name="id">26</field>
     <field name="birthyear">1982</field>
     <field name="name">Bino Drummond</field>
     <field name="party">M</field>
     <field name="constituency">Stockholms län</field>
     <field name="status">Tjänstgörande statsrådsersättare</field>
-  </add>
-  
-  <add>
+  </doc>  
+  <doc>
+    <field name="id">27</field>
     <field name="birthyear">1951</field>
     <field name="name">Björn Samuelson</field>
     <field name="party">M</field>
     <field name="constituency">Stockholms län</field>
     <field name="status">Tjänstgörande statsrådsersättare</field>
-  </add>
-  
-  <add>
+  </doc>  
+  <doc>
+    <field name="id">28</field>
     <field name="birthyear">1959</field>
     <field name="name">Anna Steele</field>
     <field name="party">FP</field>
     <field name="constituency">Stockholms län</field>
     <field name="status">Tjänstgörande statsrådsersättare</field>
-  </add>
-  
-  <add>
+  </doc>  
+  <doc>
+    <field name="id">29</field>
     <field name="birthyear">1962</field>
     <field name="name">Esabelle Dingizian</field>
     <field name="party">MP</field>
     <field name="constituency">Stockholms län</field>
     <field name="status">Tjänstgörande riksdagsledamot</field>
-  </add>
-  
-  <add>
+  </doc>  
+  <doc>
+    <field name="id">30</field>
     <field name="birthyear">1963</field>
     <field name="name">Yilmaz Kerimo</field>
     <field name="party">S</field>
     <field name="constituency">Stockholms län</field>
     <field name="status">Tjänstgörande riksdagsledamot</field>
-  </add>
-  
-  <add>
+  </doc>  
+  <doc>
+    <field name="id">31</field>
     <field name="birthyear">1963</field>
     <field name="name">Tommy Waidelich</field>
     <field name="party">S</field>
     <field name="constituency">Stockholms län</field>
     <field name="status">Tjänstgörande riksdagsledamot</field>
-  </add>
-  
-  <add>
+  </doc>  
+  <doc>
+    <field name="id">32</field>
     <field name="birthyear">1977</field>
     <field name="name">Emma Henriksson</field>
     <field name="party">KD</field>
     <field name="constituency">Stockholms län</field>
     <field name="status">Tjänstgörande riksdagsledamot</field>
-  </add>
-  
-  <add>
+  </doc>  
+  <doc>
+    <field name="id">33</field>
     <field name="birthyear">1945</field>
     <field name="name">Björn von Sydow</field>
     <field name="party">S</field>
     <field name="constituency">Stockholms län</field>
     <field name="status">Tjänstgörande riksdagsledamot</field>
-  </add>
-  
-  <add>
+  </doc>
+  <doc>
+    <field name="id">34</field>
     <field name="birthyear">1946</field>
     <field name="name">Gunnar Andrén</field>
     <field name="party">FP</field>
     <field name="constituency">Stockholms län</field>
     <field name="status">Tjänstgörande statsrådsersättare</field>
-  </add>
-  
-  <add>
+  </doc>
+  <doc>
+    <field name="id">35</field>
     <field name="birthyear">1973</field>
     <field name="name">Meeri Wasberg</field>
     <field name="party">S</field>
     <field name="constituency">Stockholms län</field>
     <field name="status">Tjänstgörande riksdagsledamot</field>
-  </add>
-</doc>
+  </doc>
+</add>
