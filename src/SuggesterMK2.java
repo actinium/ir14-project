@@ -204,19 +204,24 @@ public class SuggesterMK2 extends SolrSpellChecker {
       String[] fieldValues = scratch.split(delimiter);
       // If such syntax is used, identify the field
       if (fieldValues.length == 2) {
-
+        // Set field and value
         query.field = fieldValues[0];
         query.value = fieldValues[1];
-
+        // If the value closes the field query, reset
         if(query.value.indexOf("\"") != -1){
           query.field = null;
           query.value = null;
         }
-      } else {
-        if(scratch.indexOf("\"") != -1){
+      } 
+      else {
+        // If field is set and the word closes field query, reset
+        if(query.field != null && scratch.indexOf("\"") != -1){
           query.field = null;
           query.value = null;
-        } else {
+        } 
+        // Else field is not set or it didn't close query
+        else {
+          // if stored value is null, set it, else append
           if(query.value == null){
             query.value = scratch;
           } else {
@@ -236,8 +241,6 @@ public class SuggesterMK2 extends SolrSpellChecker {
     return scratch.toString();
   }
 
-
-
   class Query {
     String field;
     String value;
@@ -252,6 +255,8 @@ public class SuggesterMK2 extends SolrSpellChecker {
       Query query = getField(options.tokens);
       String targetField = query.field;
       String scratch = query.value;
+      if(scratch == null) return res;
+
       LOG.info("Query: " + targetField + ", " + scratch);
       Token t = null;
       for(Token token : options.tokens){
