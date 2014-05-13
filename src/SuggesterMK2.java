@@ -222,7 +222,7 @@ public class SuggesterMK2 extends SolrSpellChecker {
         // Else field is not set or it didn't close query
         else {
           // if stored value is null, set it, else append
-          if(query.value == null || query.field == null){
+          if(query.value == null){
             query.value = scratch;
           } else {
             query.value += " " + scratch;
@@ -239,6 +239,7 @@ public class SuggesterMK2 extends SolrSpellChecker {
     if(query.value != null) suffix += query.value;
 
     int index = queryString.lastIndexOf(suffix);
+	LOG.info("Suffix: " + suffix);
     if(index != -1){
       queryString = queryString.substring(0, index);
     }
@@ -297,7 +298,9 @@ public class SuggesterMK2 extends SolrSpellChecker {
       // - _ works
 
       LOG.info("Targetfield: " + targetField);
-
+	  
+	  LOG.info("Prefix" + prefix);
+	  
       // or field_value.length > 1 ?
       if (targetField != null) {
         // Autocomplete field value:
@@ -330,12 +333,17 @@ public class SuggesterMK2 extends SolrSpellChecker {
 		      suggestions.add(new LookupResult(prefix + field + delimiter, weight));
           }
         }
-
+		
+		ArrayList<Token> tokens = new ArrayList<Token>();
+        tokens.add(new Token(scratch, 0, scratch.length()));
+        SpellingOptions delegateOptions = new SpellingOptions(tokens, options.count);
+        LOG.info("new tokens: " + delegateOptions.tokens);
+		
         // Autocomplete field contents
         // Copypasted code: TODO: merge with above
         for (Map.Entry<String, List<Suggester> > delegateEntry : delegates.entrySet()) {
           // Get results from delegate
-          suggestions.addAll(getSuggestions(delegateEntry.getValue(), options, prefix));
+          suggestions.addAll(getSuggestions(delegateEntry.getValue(), delegateOptions, prefix.trim() + " "));
         }
       }
 
