@@ -305,6 +305,20 @@ public class SuggesterMK2 extends SolrSpellChecker {
       if (targetField != null) {
         // Autocomplete field value:
         String targetValue = scratch;
+		
+		// Remove AND/OR from query
+		String[] targetTokens = targetValue.split(" ");
+		StringBuilder sb = new StringBuilder();
+		int i = 0;
+		for (String token : targetTokens) {
+			if (token.toLowerCase().equals("and")) continue;
+			if (token.toLowerCase().equals("or")) continue;
+			sb.append(token);
+			if (i != targetTokens.length) sb.append(" ");
+			i++;
+		}
+		targetValue = sb.toString();
+		
         if(targetValue.startsWith(targetField)){
           targetValue = targetValue.split(delimiter)[1];
         }
@@ -336,8 +350,32 @@ public class SuggesterMK2 extends SolrSpellChecker {
           }
         }
 		
+		String newPrefix = prefix.trim();
+		if (!newPrefix.isEmpty()) newPrefix += " ";
+		
+		String targetValue = scratch;
+		// Remove AND/OR from query
+		String[] targetTokens = targetValue.split(" ");
+		StringBuilder sb = new StringBuilder();
+		int i = 0;
+		for (String token : targetTokens) {
+			if (token.toLowerCase().equals("and") && i == 0) {
+				newPrefix += token + " ";
+				continue;
+			}
+			if (token.toLowerCase().equals("or") && i == 0) {
+				newPrefix += token + " ";
+				continue;
+			}
+			sb.append(token);
+			sb.append(" ");
+			i++;
+		}
+		// Hack-hack-hackity-hack-hack
+		String queryValue = sb.toString().trim();
+		
 		ArrayList<Token> tokens = new ArrayList<Token>();
-        tokens.add(new Token(scratch, 0, scratch.length()));
+        tokens.add(new Token(queryValue, 0, queryValue.length()));
         SpellingOptions delegateOptions = new SpellingOptions(tokens, options.count);
         LOG.info("new tokens: " + delegateOptions.tokens);
 		
@@ -345,8 +383,6 @@ public class SuggesterMK2 extends SolrSpellChecker {
         // Copypasted code: TODO: merge with above
         for (Map.Entry<String, List<Suggester> > delegateEntry : delegates.entrySet()) {
           // Get results from delegate
-		  String newPrefix = prefix.trim();
-		  if (!newPrefix.isEmpty()) newPrefix += " ";
           suggestions.addAll(getSuggestions(delegateEntry.getValue(), delegateOptions, newPrefix));
         }
       }
