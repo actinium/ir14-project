@@ -328,15 +328,7 @@ public class SuggesterMK2 extends SolrSpellChecker {
         suggestions.addAll(getSuggestions(delegates.get(targetField), delegateOptions, newPrefix + targetField + delimiter));
       } else {
       // If it didn't match a field
-        // Autocomplete field name:
-        for (String field : suggestionFields) {
-          if(field.startsWith(scratch.toString())) {
-            // Sort field completions first
-			  long weight = Long.MAX_VALUE;
-		      suggestions.add(new LookupResult(prefix + field + delimiter, weight));
-          }
-        }
-		
+        
 		String newPrefix = prefix.trim();
 		if (!newPrefix.isEmpty()) newPrefix += " ";
 		
@@ -360,6 +352,15 @@ public class SuggesterMK2 extends SolrSpellChecker {
 		}
 		// Hack-hack-hackity-hack-hack
 		String queryValue = sb.toString().trim();
+		
+		// Autocomplete field name:
+        for (String field : suggestionFields) {
+          if(field.startsWith(queryValue)) {
+            // Sort field completions first
+			  long weight = Long.MAX_VALUE;
+		      suggestions.add(new LookupResult(newPrefix + field + delimiter, weight));
+          }
+        }
 		
 		ArrayList<Token> tokens = new ArrayList<Token>();
         tokens.add(new Token(queryValue, 0, queryValue.length()));
