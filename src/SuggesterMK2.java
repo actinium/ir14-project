@@ -322,7 +322,9 @@ public class SuggesterMK2 extends SolrSpellChecker {
         LOG.info("new tokens: " + delegateOptions.tokens);
 
         // Get results from delegate
-        suggestions.addAll(getSuggestions(delegates.get(targetField), delegateOptions, prefix+targetField + delimiter));
+		String newPrefix = prefix.trim();
+		if (!newPrefix.isEmpty()) newPrefix += " ";
+        suggestions.addAll(getSuggestions(delegates.get(targetField), delegateOptions, newPrefix + targetField + delimiter));
       } else {
       // If it didn't match a field
         // Autocomplete field name:
