@@ -343,7 +343,9 @@ public class SuggesterMK2 extends SolrSpellChecker {
         // Copypasted code: TODO: merge with above
         for (Map.Entry<String, List<Suggester> > delegateEntry : delegates.entrySet()) {
           // Get results from delegate
-          suggestions.addAll(getSuggestions(delegateEntry.getValue(), delegateOptions, prefix.trim() + " "));
+		  String newPrefix = prefix.trim();
+		  if (!newPrefix.isEmpty()) newPrefix += " ";
+          suggestions.addAll(getSuggestions(delegateEntry.getValue(), delegateOptions, newPrefix));
         }
       }
 
