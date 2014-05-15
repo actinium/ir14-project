@@ -306,19 +306,6 @@ public class SuggesterMK2 extends SolrSpellChecker {
         // Autocomplete field value:
         String targetValue = scratch;
 		
-		// Remove AND/OR from query
-		String[] targetTokens = targetValue.split(" ");
-		StringBuilder sb = new StringBuilder();
-		int i = 0;
-		for (String token : targetTokens) {
-			if (token.toLowerCase().equals("and")) continue;
-			if (token.toLowerCase().equals("or")) continue;
-			sb.append(token);
-			if (i != targetTokens.length) sb.append(" ");
-			i++;
-		}
-		targetValue = sb.toString();
-		
         if(targetValue.startsWith(targetField)){
           targetValue = targetValue.split(delimiter)[1];
         }
