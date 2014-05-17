@@ -251,7 +251,8 @@
 
 
     <!-- ir14 -->
-    <dynamicField name="*_ir14_auto_complete" type="ir14_auto_complete" indexed="true" stored="false" multiValued="true" />
+    <dynamicField name="*_ir14_auto_complete" type="ir14_auto_complete" indexed="true" stored="true" multiValued="true" />
+    <dynamicField name="*_ir14_bigram" type="ir14_bigram" indexed="true" stored="true" multiValued="true" />
 
  </fields>
 
@@ -302,6 +303,7 @@
 
    <!-- ir14 -->
    <copyField source="*" dest="*_ir14_auto_complete"/>
+   <copyField source="*" dest="*_ir14_bigram"/>
 
 
 
@@ -326,6 +328,15 @@
       <analyzer>
           <tokenizer class="solr.KeywordTokenizerFactory" />
           <filter class="solr.LowerCaseFilterFactory" />
+      </analyzer>
+    </fieldType>
+	
+    <!-- ir14 -->
+    <fieldType name="ir14_bigram" class="solr.TextField" positionIncrementGap="100">
+      <analyzer>
+          <tokenizer class="solr.StandardTokenizerFactory" />
+          <filter class="solr.LowerCaseFilterFactory" />
+          <filter class="solr.ShingleFilterFactory" maxShingleSize="2" outputUnigrams="true"/>
       </analyzer>
     </fieldType>
 

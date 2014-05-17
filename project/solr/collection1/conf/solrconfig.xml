@@ -1392,13 +1392,24 @@
     </arr>
   </requestHandler>
 
+  <!--
+  <searchComponent class="solr.SpellCheckComponent" name="suggest">
+    <lst name="spellchecker">
+      <str name="name">old_suggest</str>
+      <str name="classname">org.apache.solr.spelling.suggest.Suggester</str>
+      <str name="lookupImpl">org.apache.solr.spelling.suggest.tst.TSTLookupFactory</str>
+	</lst>
+  </searchComponent>
+  -->
   <!-- ir14 -->
   <searchComponent class="solr.SpellCheckComponent" name="suggest">
     <lst name="spellchecker">
       <str name="name">suggest</str>
       <str name="classname">org.DD2476.SuggesterMK2</str>
       <str name="lookupImpl">org.apache.solr.spelling.suggest.tst.TSTLookupFactory</str>
-
+	  
+	  <queryAnalyzerFieldType>string</queryAnalyzerFieldType>
+	  
   	  <!--
         Define delimiters to use for splitting queries into field name/field values.
         If several are specified, it will return results using the same delimiter as
@@ -1435,6 +1446,7 @@
         <str name="targetField">name</str>
         <str name="sourceField">name</str>
         <str name="sourceField">name_ir14_auto_complete</str>
+        <str name="sourceField">name_ir14_bigram</str>
       </lst>
 
       <lst name="delegate">
@@ -1451,11 +1463,20 @@
         <str name="targetField">block</str>
         <str name="sourceField">block</str>
   	  </lst>
+	  
+  	  <lst name="delegate">
+        <str name="targetField">content</str>
+        <str name="sourceField">content</str>
+        <str name="sourceField">content_ir14_bigram</str>
+  	  </lst>
+	  
       <float name="threshold">0.005</float>
       <str name="buildOnCommit">true</str>
     </lst>
   </searchComponent>
 
+  <queryConverter name="queryConverter" class="org.apache.solr.spelling.SuggestQueryConverter"/>
+  
   <requestHandler class="org.apache.solr.handler.component.SearchHandler" name="/suggest">
     <lst name="defaults">
       <str name="spellcheck">true</str>
